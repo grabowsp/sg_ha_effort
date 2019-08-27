@@ -6,12 +6,8 @@
 2. Get coordinates for a SNP
 3. Extract surrounding 100, 150, 200, 500bp in both directions
 * some options: samtools faidx; bedtools getfasta
-4. Use blast (or something faster - blat?) to find hits in v5 genome
+4. Use bwa to find hits in v5 genome
 5. Find location of SNP in homologous sequence
-6. Figure out how fast running on one SNP is.
-7. Try writing steps in Python
-8. Compare speeds
-9.
 
 ## Data locations
 ### v4 exome snps
@@ -44,8 +40,9 @@ head -1 combined_all_1168_samples_filtered_matrix_renamed_chroms_v4_coord.txt \
 > v4_combo_snps_header.txt
 ```
 
-## Generate v4 BED files for mapping and SNP info tables for subfiles
-### Overview
+## Round 1 (of 3) of mapping v4 to v5
+### Generate v4 BED files for mapping and SNP info tables for subfiles (Rnd 1)
+#### Overview
 * Load SNP file
 * Use SNP positions to bunch SNPs into loci
 * Generate BED file with start and end positions of loci to be used \
@@ -53,9 +50,9 @@ to extract v4 sequence using BEDtools and then mapping to v5 reference with \
 bwa mem
 * Make table with info about each SNP in relation to loci used for mapping \
 to v5 - this is important for determining exact location from bwa results
-### R script
+#### R script
 * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/make_v4_df_and_bed.r`
-### Testing with subfile 1
+#### Testing with subfile 1
 * Test sh file
   * /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files/make_v4_BED_00.sh
 ```
@@ -63,14 +60,14 @@ cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub make_v4_BED_00.sh
 ```
 * works
-### Make .sh for remaining subfiles
+#### Make .sh for remaining subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./make_v4_BED_00.sh > ./make_v4_BED_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -78,7 +75,7 @@ for SF in {01..55};
 do qsub make_v4_BED_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*v4BED.e*
@@ -86,8 +83,8 @@ rm sub*v4BED.o*
 rm sub*v4BED.p*
 ```
 
-## Get Loci v4 seq using BED files and bedtools
-### Test with subfile 1
+### Get Loci v4 seq using BED files and bedtools (Rnd 1)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp make_v4_BED_00.sh bedtools_v4seq_00.sh
@@ -97,14 +94,14 @@ cp make_v4_BED_00.sh bedtools_v4seq_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bedtools_v4seq_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bedtools_v4seq_00.sh > ./bedtools_v4seq_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -112,7 +109,7 @@ for SF in {01..55};
 do qsub bedtools_v4seq_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bedtools.e*
@@ -120,8 +117,8 @@ rm sub*bedtools.o*
 rm sub*bedtools.p*
 ```
 
-## Map v4 loci to v5 reference with bwa
-### test with subfile 1
+### Map v4 loci to v5 reference with bwa (Rnd 1)
+#### test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp bedtools_v4seq_00.sh bwa_v4v5_00.sh
@@ -131,14 +128,14 @@ cp bedtools_v4seq_00.sh bwa_v4v5_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bwa_v4v5_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bwa_v4v5_00.sh > ./bwa_v4v5_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -146,7 +143,7 @@ for SF in {01..55};
 do qsub bwa_v4v5_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bwa_v4v5.e*
@@ -154,8 +151,8 @@ rm sub*bwa_v4v5.o*
 rm sub*bwa_v4v5.p*
 ```
 
-## Connect bwa mapping info to SNP info
-### Test with subfile 1
+### Connect bwa mapping info to SNP info (Rnd 1)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp make_v4_BED_00.sh connect_v4_and_v5_00.sh
@@ -165,7 +162,7 @@ cp make_v4_BED_00.sh connect_v4_and_v5_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub connect_v4_and_v5_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
@@ -173,7 +170,7 @@ do sed 's/sub00/sub'"$SF"'/g' ./connect_v4_and_v5_00.sh > \
 ./connect_v4_and_v5_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -181,7 +178,7 @@ for SF in {01..55};
 do qsub connect_v4_and_v5_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*connect_v4v5.e*
@@ -189,7 +186,7 @@ rm sub*connect_v4v5.o*
 rm sub*connect_v4v5.p*
 ```
 
-# Test that there's no hard-masking
+### Test that there's no hard-masking (Rnd 1)
 ```
 file_inds <- sprintf('%02d', c(0:55))
 data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/', 
@@ -223,10 +220,11 @@ for(i in file_inds){
 * about 1-2% of SNPs are unmapped to v5 at this point
   * should run a second round with smaller loci
 
-## Generate BED files and snp info for second round (try2) of mapping 
-### R script
+## Round 2 (of 3) of mapping v4 to v5
+### Generate BED files and snp info for second round (try2) of mapping (Rnd 2) 
+#### R script
 * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/make_unmappped_bed.r`
-### Testing with subfile 1
+#### Testing with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp make_v4_BED_00.sh make_try2_BED_00.sh
@@ -237,14 +235,14 @@ cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub make_try2_BED_00.sh
 ```
 * works
-### Make .sh for remaining subfiles
+#### Make .sh for remaining subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./make_try2_BED_00.sh > ./make_try2_BED_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -252,7 +250,7 @@ for SF in {01..55};
 do qsub make_try2_BED_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*try2BED.e*
@@ -260,8 +258,8 @@ rm sub*try2BED.o*
 rm sub*try2BED.p*
 ```
 
-## Get v4 seq using try2 BED files and bedtools
-### Test with subfile 1
+### Get v4 seq using try2 BED files and bedtools (Rnd 2)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp bedtools_v4seq_00.sh bedtools_try2_00.sh
@@ -271,14 +269,14 @@ cp bedtools_v4seq_00.sh bedtools_try2_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bedtools_try2_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bedtools_try2_00.sh > ./bedtools_try2_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -286,7 +284,7 @@ for SF in {01..55};
 do qsub bedtools_try2_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bed_try2.e*
@@ -294,8 +292,8 @@ rm sub*bed_try2.o*
 rm sub*bed_try2.p*
 ```
 
-## Map try2 loci to v5 reference with bwa
-### test with subfile 1
+### Map try2 loci to v5 reference with bwa (Rnd 2)
+#### test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp bwa_v4v5_00.sh bwa_try2_00.sh
@@ -305,14 +303,14 @@ cp bwa_v4v5_00.sh bwa_try2_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bwa_try2_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bwa_try2_00.sh > ./bwa_try2_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -320,7 +318,7 @@ for SF in {01..55};
 do qsub bwa_try2_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bwa_try2.e*
@@ -328,8 +326,8 @@ rm sub*bwa_try2.o*
 rm sub*bwa_try2.p*
 ```
 
-## Connect try2 bwa mapping info to SNP info
-### Test with subfile 1
+### Connect try2 bwa mapping info to SNP info (Rnd 2)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp connect_v4_and_v5_00.sh connect_v4v5_try2_00.sh
@@ -339,7 +337,7 @@ cp connect_v4_and_v5_00.sh connect_v4v5_try2_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub connect_v4v5_try2_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
@@ -347,7 +345,7 @@ do sed 's/sub00/sub'"$SF"'/g' ./connect_v4v5_try2_00.sh > \
 ./connect_v4v5_try2_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -355,14 +353,14 @@ for SF in {01..55};
 do qsub connect_v4v5_try2_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*connect_try2.e*
 rm sub*connect_try2.o*
 rm sub*connect_try2.p*
 ```
-# Test that there's no hard-masking in try2 cigar scores
+### Test that there's no hard-masking in try2 cigar scores (Rnd 2)
 ```
 file_inds <- sprintf('%02d', c(0:55))
 data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/', 
@@ -386,11 +384,11 @@ for(i in file_inds){
 ```
 * no hard masking, so scripts works fine for now
 
-
-## Generate BED files and snp info for second round (try3) of mapping 
-### R script
+## Round 3 (of 3) of mapping v4 to v5
+### Generate BED files and snp info for second round (try3) of mapping (Rnd 3) 
+#### R script
 * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/make_unmappped_bed.r`
-### Testing with subfile 1
+#### Testing with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp make_try2_BED_00.sh make_try3_BED_00.sh
@@ -401,14 +399,14 @@ cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub make_try3_BED_00.sh
 ```
 * works
-### Make .sh for remaining subfiles
+#### Make .sh for remaining subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./make_try3_BED_00.sh > ./make_try3_BED_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -416,7 +414,7 @@ for SF in {01..55};
 do qsub make_try3_BED_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*try3BED.e*
@@ -424,8 +422,8 @@ rm sub*try3BED.o*
 rm sub*try3BED.p*
 ```
 
-## Get v4 seq using try3 BED files and bedtools
-### Test with subfile 1
+### Get v4 seq using try3 BED files and bedtools (Rnd 3)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp bedtools_try2_00.sh bedtools_try3_00.sh
@@ -435,14 +433,14 @@ cp bedtools_try2_00.sh bedtools_try3_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bedtools_try3_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bedtools_try3_00.sh > ./bedtools_try3_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -450,7 +448,7 @@ for SF in {01..55};
 do qsub bedtools_try3_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bed_try3.e*
@@ -458,8 +456,8 @@ rm sub*bed_try3.o*
 rm sub*bed_try3.p*
 ```
 
-## Map try3 loci to v5 reference with bwa
-### test with subfile 1
+### Map try3 loci to v5 reference with bwa (Rnd 3)
+#### test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp bwa_try2_00.sh bwa_try3_00.sh
@@ -469,14 +467,14 @@ cp bwa_try2_00.sh bwa_try3_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub bwa_try3_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
 do sed 's/sub00/sub'"$SF"'/g' ./bwa_try3_00.sh > ./bwa_try3_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -484,7 +482,7 @@ for SF in {01..55};
 do qsub bwa_try3_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*bwa_try3.e*
@@ -492,8 +490,8 @@ rm sub*bwa_try3.o*
 rm sub*bwa_try3.p*
 ```
 
-## Connect try3 bwa mapping info to SNP info
-### Test with subfile 1
+### Connect try3 bwa mapping info to SNP info (Rnd 3)
+#### Test with subfile 1
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 cp connect_v4v5_try2_00.sh connect_v4v5_try3_00.sh
@@ -503,7 +501,7 @@ cp connect_v4v5_try2_00.sh connect_v4v5_try3_00.sh
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 qsub connect_v4v5_try3_00.sh
 ```
-### Make submit files for rest of subfiles
+#### Make submit files for rest of subfiles
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 for SF in {01..55};
@@ -511,7 +509,7 @@ do sed 's/sub00/sub'"$SF"'/g' ./connect_v4v5_try3_00.sh > \
 ./connect_v4v5_try3_$SF.sh;
 done
 ```
-### Submit jobs
+#### Submit jobs
 ```
 bash
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
@@ -519,7 +517,7 @@ for SF in {01..55};
 do qsub connect_v4v5_try3_$SF.sh;
 done
 ```
-### Clean up output
+#### Clean up output
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
 rm sub*connect_try3.e*
@@ -527,7 +525,7 @@ rm sub*connect_try3.o*
 rm sub*connect_try3.p*
 ```
 
-## Test that there's no hard-masking in try3 cigar scores
+### Test that there's no hard-masking in try3 cigar scores (Rnd 3)
 ```
 file_inds <- sprintf('%02d', c(0:55))
 data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/', 
@@ -550,7 +548,7 @@ for(i in file_inds){
 ```
 * no hard masking
 
-## Compare missing data between runs
+## Compare missing data between runs of mapping v4 to v5
 ```
 file_inds <- sprintf('%02d', c(0:55))
 data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/',
@@ -620,9 +618,7 @@ table(chr_comp_vec)
 
 ```
 
-
-
-## Manually inspect quality of mapping
+## Sandbox to Manually inspect quality of mapping
 ### v4
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/ref_seqs/v4_seq
@@ -640,3 +636,114 @@ cd /home/t4c1/WORK/grabowsk/data/switchgrass/ref_seqs/v5_seq
 samtools faidx -i Pvirgatum_516_v5.0.fa Chr01N:1692297-1692376
 ```
 
+## Adjust Alleles for v4 SNPs mapped to reverse strand of v5
+### Goals
+* Want all alleles to reflect what's seen on the + strand in v5
+* Generate function that adjusts alleles to their compliment (ex A -> T)
+### Script for converting alleles
+* R script for converting reverse strand alleles:
+  * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/correct_v5_alleles.r`
+#### Test with subfile 00
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
+cp connect_v4v5_try2_00.sh correct_RevAlleles_00.sh
+```
+* adjusted script with vim
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
+qsub correct_RevAlleles_00.sh
+```
+#### Make submit files for rest of subfiles
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
+for SF in {01..55};
+do sed 's/sub00/sub'"$SF"'/g' ./correct_RevAlleles_00.sh > \
+./correct_RevAlleles_$SF.sh;
+done
+```
+#### Submit jobs
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/exome/v4_snps/sub_files
+for SF in {01..55};
+do qsub correct_RevAlleles_$SF.sh;
+done
+```
+#### Check that all jobs worked
+```
+file_inds <- sprintf('%02d', c(0:55))
+data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/',
+  'v4_snps/sub_files/', sep = '')
+
+for(i in file_inds){
+  print(paste('importing', i))
+  tmp_data_file <- paste(data_dir, 'sub', i, '_rev_corrected_v4_and_v5info.rds',
+    sep = '')
+  tmp_data <- readRDS(tmp_data_file)
+  tmp_num_changes <- sum(tmp_data$ref != tmp_data$v5_ref)
+  print(tmp_num_changes)
+  } 
+```
+* worked!
+
+## Generate final file with v4 and v5 info
+```
+file_inds <- sprintf('%02d', c(0:55))
+data_dir <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/',
+  'v4_snps/sub_files/', sep = '')
+
+data_list_0 <- list()
+
+for(i in file_inds){
+  print(paste('importing', i))
+  tmp_data_file <- paste(data_dir, 'sub', i, '_rev_corrected_v4_and_v5info.rds',
+    sep = '')
+  tmp_data <- readRDS(tmp_data_file)
+  data_list_0[[i]] <- tmp_data
+  }
+
+data_list <- list()
+# need to decipher the final v5 chromosome
+for(j in seq(length(data_list_0))){
+  tmp_data <- data_list_0[[j]]
+  tmp_data$final_v5_chr <- NA
+  try1_inds <- which(tmp_data$map_score == 60)
+  try2_inds <- which(tmp_data$try2_map_score == 60)
+  try3_inds <- which(tmp_data$try3_map_score == 60)
+  tmp_data$final_v5_chr[try1_inds] <- tmp_data$v5_chr[try1_inds]
+  tmp_data$final_v5_chr[try2_inds] <- tmp_data$try2_v5_chr[try2_inds]
+  tmp_data$final_v5_chr[try3_inds] <- tmp_data$try3_v5_chr[try3_inds]
+  data_list[[j]] <- tmp_data
+}
+
+v5_info_df <- data.frame(
+  v4_chr = unlist(lapply(data_list, function(x) x$v4_chr)),
+  v4_pos = unlist(lapply(data_list, function(x) x$orig_pos)),
+  v4_snp_name = unlist(lapply(data_list, function(x) x$v4_snp_name)),
+  v4_ref = unlist(lapply(data_list, function(x) x$ref)),
+  v4_alleles = unlist(lapply(data_list, function(x) x$alleles)),
+  v5_chr = unlist(lapply(data_list, function(x) x$final_v5_chr)),
+  v5_pos = unlist(lapply(data_list, function(x) x$v5_pos)),
+  v5_ref = unlist(lapply(data_list, function(x) x$v5_ref)),
+  v5_alleles = unlist(lapply(data_list, function(x) x$v5_alleles)),
+  v5_strand_flag = unlist(lapply(data_list, function(x) x$final_strand_flag)),
+  try1_locus = unlist(lapply(data_list, function(x) x$locus)),
+  try2_locus = unlist(lapply(data_list, function(x) x$try2_locus)),
+  try3_locus = unlist(lapply(data_list, function(x) x$try3_locus)),
+  try1_map_score = unlist(lapply(data_list, function(x) x$map_score)),
+  try2_map_score = unlist(lapply(data_list, function(x) x$try2_map_score)),
+  try3_map_score = unlist(lapply(data_list, function(x) x$try3_map_score)),
+  stringsAsFactors = F)
+
+out_rds_file <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/',
+  'v4_snps/v4_to_v5_snp_info.rds', sep = '')
+
+saveRDS(v5_info_df, file = out_rds_file)
+
+out_txt_file <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/exome/',
+  'v4_snps/v4_to_v5_snp_info.txt', sep = '')
+
+write.table(v5_info_df, file = out_txt_file, quote = F, sep = '\t', 
+  row.names = F, col.names = T)
+
+
+```
