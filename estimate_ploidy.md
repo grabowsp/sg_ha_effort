@@ -23,9 +23,7 @@
 bzcat \
 /home/f1p1/tmp/sujan/Pvirgatum_V5/0.RAW_CALLS/MNP/Pvirgatum_1035g_MNP.vcf.bz2 \
 | head -500 > /home/grabowsky_scratch/sg_ploidy/test/mnp_sg_snps_test500.vcf
-```
-*
-```
+
 bzcat \
 /home/f1p1/tmp/sujan/Pvirgatum_V5/0.RAW_CALLS/MNP/Pvirgatum_1035g_MNP.vcf.bz2 \
 | head -100000 > ./mnp_snps_100k.vcf
@@ -33,6 +31,13 @@ bzcat \
 bzcat \
 /home/f1p1/tmp/sujan/Pvirgatum_V5/0.RAW_CALLS/MNP/Pvirgatum_1035g_MNP.vcf.bz2 \
 | head -1000000 > ./mnp_snps_1M.vcf
+```
+* generate sample name file
+```
+head -5 mnp_sg_snps_test500.vcf | tail -n 1 > samp_name_line.txt
+```
+* NOTE: NEED TO TEST FROM HERE - I JUST REPLACED THE FILES WITH UPDATED FILES
+FROM SUJAN
 
 
 for j in {900..903};
