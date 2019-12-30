@@ -9,7 +9,7 @@ library(ggplot2)
 
 ### SET INPUTS ###
 # Counts of genic MNPSs with 20+ depth in each allele
-mnp_rds <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/genic_MNP_count_list_20depth.rds'
+mnp_rds <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/CDS_MNP_count_list_20depth.rds'
 mnp_20_list <- readRDS(mnp_rds)
 
 # Get chromosome names
@@ -29,9 +29,9 @@ meta_remove <- as.vector(read.table(meta_lib_remove_file, header = T,
 ### SET OUTPUTS ###
 fig_out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/'
 
-fig_prefix <- 'genic_MNP_20depth_'
+fig_prefix <- 'CDS_MNP_20depth_'
 
-title_prefix <- 'Genic MNPs with 20+ reads per allele'
+title_prefix <- 'CDS MNPs with 20+ reads per allele'
 
 ### SET VARIABLES ###
 
@@ -47,7 +47,7 @@ colnames(lib_mnp_mat) <- chrom_names
 tot_mnp_20d <- apply(lib_mnp_mat, 1, sum)
 #summary(tot_mnp_20d)
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#   0.0   431.2   792.0   763.0  1113.5  3135.0
+#   0.0   192.2   338.0   325.1   461.8  2900.0  
 
 # Get the sequencing output for each sample
 tot_coverage <- apply(depth_mat, 1, sum)
@@ -59,7 +59,7 @@ tot_coverage <- apply(depth_mat, 1, sum)
 tot_mnp_20d_corrected <- (tot_mnp_20d / tot_coverage) * min(tot_coverage)
 #summary(tot_mnp_20d_corrected)
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#  0.000   3.995   7.124   7.848   9.640 425.573
+#  0.000   1.814   3.024   3.494   4.006 393.672
 
 lib_info_df <- data.frame(lib = names(tot_mnp_20d), mnp_20d = tot_mnp_20d,
   mnp_20d_stand = tot_mnp_20d_corrected, seq_cov = tot_coverage,

@@ -8,9 +8,9 @@
 library(ggplot2)
 
 ### SET INPUTS ###
-# Counts of genic MNPSs with 20+ depth in each allele
-mnp_rds <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/genic_MNP_count_list_20depth.rds'
-mnp_20_list <- readRDS(mnp_rds)
+# Counts of genic MNPSs with 10+ depth in each allele
+mnp_rds <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_25/genic_MNP_count_list_25depth.rds'
+mnp_list <- readRDS(mnp_rds)
 
 # Get chromosome names
 chrom_name_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/test_dir/chr_names.txt'
@@ -27,11 +27,11 @@ meta_remove <- as.vector(read.table(meta_lib_remove_file, header = T,
   stringsAsFactors = F)[,1])
 
 ### SET OUTPUTS ###
-fig_out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/'
+fig_out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_25/'
 
-fig_prefix <- 'genic_MNP_20depth_'
+fig_prefix <- 'genic_MNP_25depth_'
 
-title_prefix <- 'Genic MNPs with 20+ reads per allele'
+title_prefix <- 'Genic MNPs with 25+ reads per allele'
 
 ### SET VARIABLES ###
 
@@ -39,15 +39,15 @@ title_prefix <- 'Genic MNPs with 20+ reads per allele'
 
 ##########
 
-lib_mnp_mat <- matrix(data = unlist(mnp_20_list), byrow = T,
-  nrow = length(mnp_20_list))
-rownames(lib_mnp_mat) <- names(mnp_20_list)
+lib_mnp_mat <- matrix(data = unlist(mnp_list), byrow = T,
+  nrow = length(mnp_list))
+rownames(lib_mnp_mat) <- names(mnp_list)
 colnames(lib_mnp_mat) <- chrom_names
 
-tot_mnp_20d <- apply(lib_mnp_mat, 1, sum)
-#summary(tot_mnp_20d)
+tot_mnp <- apply(lib_mnp_mat, 1, sum)
+#summary(tot_mnp)
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#   0.0   431.2   792.0   763.0  1113.5  3135.0
+#   0.0   164.0   312.5   308.8   434.0  1898.0
 
 # Get the sequencing output for each sample
 tot_coverage <- apply(depth_mat, 1, sum)
@@ -56,13 +56,13 @@ tot_coverage <- apply(depth_mat, 1, sum)
 #sum(rownames(depth_mat) != rownames(lib_mnp_mat))
 #[1] 0
 
-tot_mnp_20d_corrected <- (tot_mnp_20d / tot_coverage) * min(tot_coverage)
-#summary(tot_mnp_20d_corrected)
+tot_mnp_corrected <- (tot_mnp / tot_coverage) * min(tot_coverage)
+#summary(tot_mnp_corrected)
 #   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-#  0.000   3.995   7.124   7.848   9.640 425.573
+#  0.000   1.562   2.818   3.407   3.773 257.651
 
-lib_info_df <- data.frame(lib = names(tot_mnp_20d), mnp_20d = tot_mnp_20d,
-  mnp_20d_stand = tot_mnp_20d_corrected, seq_cov = tot_coverage,
+lib_info_df <- data.frame(lib = names(tot_mnp), mnp = tot_mnp,
+  mnp_stand = tot_mnp_corrected, seq_cov = tot_coverage,
   stringsAsFactors = F)
 
 rm_inds <- c()
@@ -73,7 +73,7 @@ for(mr in meta_remove){
 
 filt_lib_df <- lib_info_df[-rm_inds, ]
 
-tot_hist <- ggplot(data = lib_info_df) + geom_density(aes(x = mnp_20d),
+tot_hist <- ggplot(data = lib_info_df) + geom_density(aes(x = mnp),
   fill = 'grey50') + ggtitle(title_prefix)
 
 tot_hist_file <- paste(fig_out_dir, fig_prefix,'hist.pdf', sep = '')
@@ -84,7 +84,7 @@ dev.off()
 
 ########
 stand_hist <- ggplot(data = lib_info_df) + 
-  geom_density(aes(x = mnp_20d_stand),
+  geom_density(aes(x = mnp_stand),
   fill = 'grey50') + 
   ggtitle(paste(title_prefix, '\nstandardized by sequencing output', sep = ''))
 
@@ -97,7 +97,7 @@ dev.off()
 ########
 
 filt_hist <- ggplot(data = filt_lib_df) + 
-  geom_density(aes(x = mnp_20d), fill = 'grey50') + 
+  geom_density(aes(x = mnp), fill = 'grey50') + 
   ggtitle(paste(title_prefix, ' in Filtered Samples', sep = ''))
 
 filt_hist_file <- paste(fig_out_dir, fig_prefix, 'hist_filt.pdf', 
@@ -109,7 +109,7 @@ dev.off()
 ##########
 
 filt_stand_hist <- ggplot(data = filt_lib_df) +
-  geom_density(aes(x = mnp_20d_stand), fill = 'grey50') + 
+  geom_density(aes(x = mnp_stand), fill = 'grey50') + 
   ggtitle(paste(title_prefix, 
     ' in Filtered Samples\nStandardized by Sequencing Output', sep = ''))
 

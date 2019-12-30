@@ -191,13 +191,13 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/depth20
 cp ../depth10/chr_awk_depth10_00.sh ./chr_awk_depth20_00.sh
 # edited with vim
 
-for LIB in {01..27};
+for LIB in {01..28};
   do
   sed 's/sub_00/'sub_"$LIB"'/g' chr_awk_depth20_00.sh \
 > chr_awk_depth20_$LIB'.sh';
   done
 
-for LIB in {00..27};
+for LIB in {00..28};
   do
   sbatch chr_awk_depth20_$LIB'.sh';
   done
@@ -205,13 +205,13 @@ for LIB in {00..27};
 cp ../depth10/full_split_depth10_00.sh ./full_split_depth20_00.sh
 # edited with vim
 
-for LIB in {01..21};
+for LIB in {01..20};
   do
   sed 's/sub_00/'sub_"$LIB"'/g' full_split_depth20_00.sh \
 > full_split_depth20_$LIB'.sh';
   done
 
-for LIB in {00..21};
+for LIB in {00..20};
   do
   sbatch full_split_depth20_$LIB'.sh';
   done
@@ -313,6 +313,200 @@ cp chr_MNP_pos_depth20_00.sh chr_MNP_pos_depth20_redo01.sh
 
 sbatch chr_MNP_pos_depth20_redo01.sh
 ```
+
+## Get Chromsome Positions of MNPs with 15+ reads
+* Directory
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_15`
+### Generate Scripts
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_15
+
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/chr_MNP_pos_depth20_00.sh ./chr_MNP_pos_depth15_00.sh
+
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/full_MNP_pos_depth20_00.sh ./full_MNP_pos_depth15_00.sh
+
+for LIB in {01..28};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' chr_MNP_pos_depth15_00.sh \
+> chr_MNP_pos_depth15_$LIB'.sh';
+  done
+
+for LIB in {00..28};
+  do
+  sbatch chr_MNP_pos_depth15_$LIB'.sh';
+  done
+
+for LIB in {01..20};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' full_MNP_pos_depth15_00.sh \
+> full_MNP_pos_depth15_$LIB'.sh';
+  done
+
+for LIB in {00..20};
+  do
+  sbatch full_MNP_pos_depth15_$LIB'.sh';
+  done
+```
+
+## Get Chromsome Positions of MNPs with 25+ reads
+* Directory
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_25`
+### Generate Scripts
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_25
+  
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/chr_MNP_pos_depth20_00.sh ./chr_MNP_pos_depth25_00.sh
+
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/full_MNP_pos_depth20_00.sh ./full_MNP_pos_depth25_00.sh
+
+for LIB in {01..28};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' chr_MNP_pos_depth25_00.sh \
+> chr_MNP_pos_depth25_$LIB'.sh';
+  done
+
+for LIB in {00..28};
+  do
+  sbatch chr_MNP_pos_depth25_$LIB'.sh';
+  done
+
+for LIB in {01..20};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' full_MNP_pos_depth25_00.sh \
+> full_MNP_pos_depth25_$LIB'.sh';
+  done
+
+for LIB in {00..20};
+  do
+  sbatch full_MNP_pos_depth25_$LIB'.sh';
+  done
+
+# Generate two new script: one for a failed node and one for results I \
+# deleted like a moron
+
+cp chr_MNP_pos_depth25_00.sh chr_MNP_pos_depth25_finish20.sh
+
+cp chr_MNP_pos_depth25_00.sh chr_MNP_pos_depth25_rerun_IGN.sh
+
+sbatch chr_MNP_pos_depth25_finish20.sh
+sbatch chr_MNP_pos_depth25_rerun_IGN.sh
+```
+
+## Get Chromsome Positions of MNPs with 5+ reads
+* Directory
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_05`
+### Generate Scripts
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_05
+
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/chr_MNP_pos_depth20_00.sh ./chr_MNP_pos_depth05_00.sh
+
+cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/full_MNP_pos_depth20_00.sh ./full_MNP_pos_depth05_00.sh
+
+for LIB in {01..28};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' chr_MNP_pos_depth05_00.sh \
+> chr_MNP_pos_depth05_$LIB'.sh';
+  done
+
+for LIB in {00..28};
+  do
+  sbatch chr_MNP_pos_depth05_$LIB'.sh';
+  done
+
+for LIB in {01..20};
+  do
+  sed 's/sub_00/'sub_"$LIB"'/g' full_MNP_pos_depth05_00.sh \
+> full_MNP_pos_depth05_$LIB'.sh';
+  done
+
+for LIB in {00..20};
+  do
+  sbatch full_MNP_pos_depth05_$LIB'.sh';
+  done
+```
+
+###################
+
+## Get Chromosome Positions for MNPs with 3+, 4+, 6+ and 7+ reads
+* Will do as much of the prep in parallel as possible
+* Directories
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_03`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_04`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_06`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_07`
+### Generate Scripts
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+
+# Copy scripts from previous depths
+for DEPTH in 03 04 06 07;
+  do
+  cd ./pos_$DEPTH;
+  cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/chr_MNP_pos_depth20_00.sh chr_MNP_pos_depth$DEPTH'_00.sh';
+  cp /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/pos_20/full_MNP_pos_depth20_00.sh full_MNP_pos_depth$DEPTH'_00.sh';
+  cd ..;
+  done 
+# adjust scripts with vim
+
+# Make copies for each library name sub-file
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+
+for DEPTH in 03 04 06 07;
+  do
+  cd ./pos_$DEPTH; 
+  for LIB in {01..28};
+    do 
+    sed 's/sub_00/'sub_"$LIB"'/g' chr_MNP_pos_depth$DEPTH'_00.sh' \
+      > 'chr_MNP_pos_depth'$DEPTH'_'$LIB'.sh';
+    done;
+  cd ..;
+  done
+
+for DEPTH in 03 04 06 07;
+  do
+  cd ./pos_$DEPTH;
+  for LIB in {01..20};
+    do
+    sed 's/sub_00/'sub_"$LIB"'/g' full_MNP_pos_depth$DEPTH'_00.sh' \
+      > 'full_MNP_pos_depth'$DEPTH'_'$LIB'.sh';
+    done;
+  cd ..;
+  done
+
+# submit jobs
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+
+for DEPTH in 03 04 06 07;
+  do
+  cd ./pos_$DEPTH;
+  for LIB in {00..28};
+    do
+    sbatch 'chr_MNP_pos_depth'$DEPTH'_'$LIB'.sh'
+    done;
+  cd ..;
+  done
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+
+for DEPTH in 03 04 06 07;
+  do
+  cd ./pos_$DEPTH;
+  for LIB in {00..20};
+    do
+    sbatch 'full_MNP_pos_depth'$DEPTH'_'$LIB'.sh'
+    done;
+  cd ..;
+  done
+```
+
+
+
+#####################
+
+
+
+
 
 ## Tally total seq coverage from Sujans ATCG count files
 * Location of results
