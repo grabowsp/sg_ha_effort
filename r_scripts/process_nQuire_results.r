@@ -32,9 +32,10 @@ samp_summary_nohead <- paste(samp_name, '.nQuire_res_summary.no_head.txt',
 
 ##################
 # get coverage and quality info
-cov_vec <- unlist(lapply(strsplit(lrd_res$file, split = '_'), function(x) x[2]))
-qual_vec <- unlist(
-             lapply(strsplit(lrd_res$file, split = '_'), function(x) x[3]))
+cov_vec <- as.numeric(gsub('c', '', 
+  unlist(lapply(strsplit(lrd_res$file, split = '_'), function(x) x[2]))))
+qual_vec <- as.numeric(gsub('-bedcc.bin', '', gsub('q', '', unlist(
+  lapply(strsplit(lrd_res$file, split = '_'), function(x) x[3])))))
 
 lrd_res$coverage <- cov_vec
 lrd_res$qual <- qual_vec
