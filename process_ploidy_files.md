@@ -426,8 +426,6 @@ for LIB in {00..20};
   done
 ```
 
-###################
-
 ## Get Chromosome Positions for MNPs with 3+, 4+, 6+ and 7+ reads
 * Will do as much of the prep in parallel as possible
 * Directories
@@ -499,14 +497,6 @@ for DEPTH in 03 04 06 07;
   cd ..;
   done
 ```
-
-
-
-#####################
-
-
-
-
 
 ## Tally total seq coverage from Sujans ATCG count files
 * Location of results

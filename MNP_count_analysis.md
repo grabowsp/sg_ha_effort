@@ -28,7 +28,6 @@ sbatch count_genic_MNPs_20depth.sh
 ### Analyse 20+ depth genic MNP numbers
 * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/analyze_genic_MNPs_20depth.r`
 
-
 ## CDS MNPs with 20+ depth per allele
 ### Tally CDS MNPs
 #### Scripts
@@ -235,8 +234,101 @@ sbatch count_CDS_MNPs_05depth.sh
 ```
 cd /home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/
 cp analyze_CDS_MNPs_10depth.r analyze_CDS_MNPs_05depth.r
-# NEED TO RUN
 ```
+
+########################
+## Genic MNPs with 3, 4, 6, and 7 depth per allele
+### Tally genic MNPs
+#### Scripts
+```
+# copy and adjust R scripts
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+cp ./pos_20/MNP_20depth_genic_counts.r ./pos_03/MNP_03depth_genic_counts.r
+cp ./pos_20/MNP_20depth_genic_counts.r ./pos_04/MNP_04depth_genic_counts.r
+cp ./pos_20/MNP_20depth_genic_counts.r ./pos_06/MNP_06depth_genic_counts.r
+cp ./pos_20/MNP_20depth_genic_counts.r ./pos_07/MNP_07depth_genic_counts.r
+# adjust files in vim
+
+# copy and adjust submit scripts
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+cp ./pos_10/count_genic_MNPs_10depth.sh ./pos_03/count_genic_MNPs_03depth.sh
+cp ./pos_10/count_genic_MNPs_10depth.sh ./pos_04/count_genic_MNPs_04depth.sh
+cp ./pos_10/count_genic_MNPs_10depth.sh ./pos_06/count_genic_MNPs_06depth.sh
+cp ./pos_10/count_genic_MNPs_10depth.sh ./pos_07/count_genic_MNPs_07depth.sh
+# adjust files in vim
+
+# submit jobs
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+for RD in 03 04 06 07;
+  do
+  cd ./pos_$RD;
+  sbatch count_genic_MNPs_$RD'depth.sh';
+  cd ..;
+  done
+```
+### Analyse genic MNPs with 3,4,6,7 depth
+* on HA
+```
+cd /home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/
+cp analyze_genic_MNPs_05depth.r analyze_genic_MNPs_03depth.r
+cp analyze_genic_MNPs_05depth.r analyze_genic_MNPs_04depth.r
+cp analyze_genic_MNPs_05depth.r analyze_genic_MNPs_06depth.r
+cp analyze_genic_MNPs_05depth.r analyze_genic_MNPs_07depth.r
+```
+
+## CDS MNPs with 3,4,6,7 depth per allele
+### Figures
+### Tally CDS MNPs
+#### Scripts
+```
+# copy and adjust R script
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+cp ./pos_20/MNP_20depth_CDS_counts.r ./pos_03/MNP_03depth_CDS_counts.r
+cp ./pos_20/MNP_20depth_CDS_counts.r ./pos_04/MNP_04depth_CDS_counts.r
+cp ./pos_20/MNP_20depth_CDS_counts.r ./pos_06/MNP_06depth_CDS_counts.r
+cp ./pos_20/MNP_20depth_CDS_counts.r ./pos_07/MNP_07depth_CDS_counts.r
+# adjust in vim
+
+# copy and adjust submit scripts
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+cp ./pos_10/count_CDS_MNPs_10depth.sh ./pos_03/count_CDS_MNPs_03depth.sh
+cp ./pos_10/count_CDS_MNPs_10depth.sh ./pos_04/count_CDS_MNPs_04depth.sh
+cp ./pos_10/count_CDS_MNPs_10depth.sh ./pos_06/count_CDS_MNPs_06depth.sh
+cp ./pos_10/count_CDS_MNPs_10depth.sh ./pos_07/count_CDS_MNPs_07depth.sh
+# adjust files in vim
+
+# submit jobs
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts
+for RD in 03 04 06 07;
+  do
+  cd ./pos_$RD;
+  sbatch count_CDS_MNPs_$RD'depth.sh';
+  cd ..;
+  done
+```
+### Analyse CDS MNPs with 3,4,6,7 depth
+* on HA
+```
+cd /home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/
+cp analyze_CDS_MNPs_05depth.r analyze_CDS_MNPs_03depth.r
+cp analyze_CDS_MNPs_05depth.r analyze_CDS_MNPs_04depth.r
+cp analyze_CDS_MNPs_05depth.r analyze_CDS_MNPs_06depth.r
+cp analyze_CDS_MNPs_05depth.r analyze_CDS_MNPs_07depth.r
+```
+
+## Generate Figures of MNP vs metadata info
+* Use the same R script and adjust the depth threshold and genomic region \
+to generate plots for the different MNP counts
+* On HA
+  * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/MNP_vs_metadata.r`
+  * Run interactively on Cori
+  * Generates 1D and 2D plots (vs seq coverage) of MNP counts color coded \
+by different info from the metadata
+
+## Generate Figures of MNP vs Cultivar Expectations
+* On HA
+  * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/MNP_cultivar.r`
+##############
 
 ## Analyze All MNPs with 20+ depth per allele
 * One big peak and then long tail - hard to separate 4X from 8X
@@ -253,4 +345,6 @@ cp analyze_CDS_MNPs_10depth.r analyze_CDS_MNPs_05depth.r
 ### Script
 * On HA
   * `/home/grabowsky/tools/workflows/sg_ha_effort/r_scripts/analyze_MNPs_10depth.r`
+
+
 
