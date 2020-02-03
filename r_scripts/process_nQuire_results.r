@@ -7,7 +7,7 @@
 args <- commandArgs(trailingOnly = T)
 
 res_file <- as.character(args[1])
-lrd_df <- read.table(file = res_file, header = T, stringsAsFactors = F,
+lrd_res <- read.table(file = res_file, header = T, stringsAsFactors = F,
   sep = '\t')
 
 snp_file <- as.character(args[2])
@@ -16,7 +16,7 @@ snp_res <- read.table(snp_file, header = F, stringsAsFactors = F)
 ### SET OUTPUTS
 # get sample name from file name
 samp_name <- unlist(lapply(
-    strsplit(lrd_df$file, split = '_'), function(x) x[1]))[1]
+    strsplit(lrd_res$file, split = '_'), function(x) x[1]))[1]
 
 # Full matrix of results
 samp_full_res_out <- paste(samp_name, '.lrd_results_processed.txt', sep = '')
@@ -32,15 +32,15 @@ samp_summary_nohead <- paste(samp_name, '.nQuire_res_summary.no_head.txt',
 
 ##################
 # get coverage and quality info
-cov_vec <- unlist(lapply(strsplit(lrd_df$file, split = '_'), function(x) x[2]))
+cov_vec <- unlist(lapply(strsplit(lrd_res$file, split = '_'), function(x) x[2]))
 qual_vec <- unlist(
-             lapply(strsplit(lrd_df$file, split = '_'), function(x) x[3]))
+             lapply(strsplit(lrd_res$file, split = '_'), function(x) x[3]))
 
-lrd_df$coverage <- cov_vec
-lrd_df$qual <- qual_vec
+lrd_res$coverage <- cov_vec
+lrd_res$qual <- qual_vec
 
 # add SNP info
-lrd_df$nSNPs <- snp_res[,1]
+lrd_res$nSNPs <- snp_res[,1]
 
 # calculate the proportion of d_loglikelihood
 lrd_res$d_dip_portion <- (lrd_res$d_dip /
