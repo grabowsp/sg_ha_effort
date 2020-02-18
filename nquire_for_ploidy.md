@@ -78,9 +78,36 @@ for SUBSET in {001..172};
   do
   sbatch CDS_nquire_$SUBSET'.sh';
   done
-
-
 ```
+
+## Re-run failed jobs
+### List of failed jobs
+* list of subset_6 id's that had node failures on cori
+  * /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire/node_fail_list.txt
+### Remove results that will be re-made
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire
+
+for SUBSET in `cat node_fail_list.txt`;
+#for SUBSET in `head -3 node_fail_list.txt`;
+  do
+  for TEST_LIB in `cat /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/subsamp_lists/Pvirgatum_v5_libs_sub6_$SUBSET`;
+    do
+#    echo $TEST_LIB;
+    rm $TEST_LIB*;
+    done;
+  done
+```
+### Re-run jobs
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire
+
+for SUBSET in `cat node_fail_list.txt`;
+  do
+  sbatch CDS_nquire_$SUBSET'.sh';
+  done
+```
+
 
 ## Test workflow
 ### Run nQuire and get lrd results
