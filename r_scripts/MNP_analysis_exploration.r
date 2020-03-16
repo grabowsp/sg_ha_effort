@@ -63,9 +63,11 @@ fig_out_dir <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/MNP_counts/',
 plot_height <- 5
 plot_width <- 5.5
 
+# results table
+mnp_res_table_file <- paste(fig_out_dir, 'pos_0', seq_depth_char, 
+  '_MNP_results_with_meta_info.txt', sep = '')
+
 ### SET VARIABLES ###
-
-
 
 ### SET CONSTANTS ###
 
@@ -161,6 +163,10 @@ for(ci in seq(nrow(cult_info_2))){
   filt_lib_df$Cultivar_ecotype[tmp_meta_ind] <- cult_info_2$Ecotype[ci]
   filt_lib_df$Cultivar_ploidy[tmp_meta_ind] <- cult_info_2$Typical.Ploidy[ci]
 }
+
+# Save results table
+write.table(filt_lib_df, file = mnp_res_table_file, quote = F, sep = '\t', 
+  row.names = F, col.names = T)
 
 # MNP vs depth color coded by different ploidy data
 

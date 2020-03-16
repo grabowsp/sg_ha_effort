@@ -11,13 +11,11 @@ way
   * 4X = ABHM
   * 8X = IENS
 
-
 ## Test nQuire using CDS BED and 4X sample
 * CDS BED location
   * `/global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed`
 ### 4X
 ```
-
 module load python/3.7-anaconda-2019.07
 source activate poplar_align
 

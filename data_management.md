@@ -32,3 +32,13 @@ to load in R
     * `reseq_cultivars.tsv`
   * Updated file
     * `switchgrass_reseq_cultivars_corrected.tsv`
+
+## Genotype VCFs
+### LD-prunded VCF
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/ld_prune_vcf/ldprune0.6_unimpute_4d_anc.vcf`
+  * This turned out to only have the punitive 4X (not totally correct) samples
+
+## Ploidy info
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/ploidy_calling/sg_ploidy_results_v1.0.txt`
+
+ 

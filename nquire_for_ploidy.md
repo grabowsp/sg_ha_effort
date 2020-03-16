@@ -108,6 +108,72 @@ for SUBSET in `cat node_fail_list.txt`;
   done
 ```
 
+## Combine results
+* Combined result file on NERSC
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire/sg_reseq_nQuire_results_summary_total.txt`
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire
+
+cat `head -1 IICY.nQuire_res_summary.txt` 
+
+head -1 IICY.nQuire_res_summary.txt | cat - *nQuire_res_summary.no_head.txt \
+> sg_reseq_nQuire_results_summary_total.txt
+```
+
+## Extract results for c30 and c40
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/sg_nquire/sg_CDS_nquire
+
+for RES in `ls *lrd_results_processed.txt`;
+do
+head -3 $RES | tail -n 1 >> CDS_nquire_c30_results_total.tmp;
+done
+
+head -1 XXBC.lrd_results_processed.txt | cat - \
+CDS_nquire_c30_results_total.tmp > CDS_nquire_c30_results_total.txt
+
+for RES in `ls *lrd_results_processed.txt`;
+do
+head -4 $RES | tail -n 1 >> CDS_nquire_c40_results_total.tmp;
+done
+
+head -1 XXBC.lrd_results_processed.txt | cat - \
+CDS_nquire_c40_results_total.tmp > CDS_nquire_c40_results_total.txt
+
+```
+
+## Analyze nQuire results
+### Notes
+* Want to see
+  * c20_min vs c50_min
+  * c20_min vs coverage
+  * c50_min vs coverage
+  * c20_min vs nSNPs
+  * c50_min vs nSNPs
+  * c20_min vs dip_slope
+  * c50_min vs dip_slope
+  * c20_min vs tet_slope
+  * c50_min vs tet_slope
+  * c20_min vs Sujan
+  * c50_min vs Sujan
+  * dip_slope vs Sujan
+  * tet_slope vs Sujan
+* 4X-vs-8X calls are the exact same for c20 proportions and slope_vs_c50 proportions
+* Will include the nquire calls (which include 6X calls) and cluster-calls
+* It looks like nQuire works best with a lot of SNPs
+  * the slopes show a relationship to c50 nSNPs but not to c20 nSNPs
+  * there are WAY more c20 SNPs
+  * Might be worth looking at results for c30/40
+    * Numbers of SNPs
+    * How those results compare to c20 results
+###
+* scripts for exploring results
+  * `~/sg_ha_effort/r_scripts/nquire_exploration.r`
+  * `~/sg_ha_effort/r_scripts/nquire_exploration_2.r`
+* script for calling ploidy
+  * `~/sg_ha_effort/r_scripts/nquire_ploidy_calls.r`
+
+
 
 ## Test workflow
 ### Run nQuire and get lrd results
