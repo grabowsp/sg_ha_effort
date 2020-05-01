@@ -1,3 +1,35 @@
+
+test_file <- 'Chr09N_filt_split_07_pseudohapgenos_v01.rds'
+test <- readRDS(test_file)
+
+full_mat <- matrix(unlist(test[, c(6:ncol(test))]), ncol = nrow(test), 
+  byrow = T)
+
+rownames(full_mat) <- colnames(test)[c()]
+
+full_dist_man <- dist(full_mat, diag = T, upper = T, method = 'manhattan')
+full_dist_euc <- dist(full_mat, diag = T, upper = T, method = 'euclidean')
+
+
+
+
+test_0 <- matrix(unlist(test[c(1:100), c(6:25)]), nrow = 100, byrow = F)
+
+test_1 <- matrix(unlist(test[c(1:100), c(6:25)]), ncol = 100, byrow = T)
+
+colnames(test_0) <- colnames(test)[c(6:25)]
+
+rownames(test_1) <- colnames(test)[c(6:25)]
+
+test_dist <- dist(t(test_0), diag = T, upper = T, method = 'manhattan')
+
+test_dist_1 <- dist(test_1, diag = T, upper = T, method = 'manhattan')
+
+test_mat <- matrix(unlist(test[, c(6:ncol(test))]), nrow = nrow(test), 
+  byrow = F)
+
+
+
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/pseudohap
 

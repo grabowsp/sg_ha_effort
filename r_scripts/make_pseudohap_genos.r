@@ -21,7 +21,7 @@ pseudohaps <- apply(ratios[, c(6:ncol(ratios))], 2, function(x)
   sapply(x, function(y) rbinom(n = 1, size = 1, prob = y))
 )
 
-pseudohap_df <- data.frame(snp_info, pseudohaps, stringAsFactors = F)
+pseudohap_df <- data.frame(snp_info, pseudohaps, stringsAsFactors = F)
 
 saveRDS(pseudohap_df, file = out_file)
 
