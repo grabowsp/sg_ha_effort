@@ -6,10 +6,161 @@
 * My directory
   * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs`
 
-### Unzip vcfs
+## Files to help process VCFs
+* BED Files
+  * CDS BED
+    * `/global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed`
+  * Genes BED
+    * `/global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_genes.bed`
+* Library names by Ploidy Call
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt`
+
+## Unzip vcfs
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
 sbatch unzip_Chr01K.sh
 ```
+
+## Generate CDS VCFs for each chromosome
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
+
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
+sbatch generate_Chr01K_N_CDS_vcfs.sh
+
+gunzip -kc Chr01K.polyploid.CDS.vcf.gz | head 
+
+sbatch generate_Chr02to05_CDS_vcfs.sh
+sbatch generate_Chr06to09_CDS_vcfs.sh
+```
+* Moved to `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs`
+
+## Filter CDS for included samples
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
+
+sbatch generate_Chr01K_01N_CDS_allsamp_vcf.sh
+
+
+```
+
+## Split vcfs into 100k files - NOT YET
+* note: don't do this yet
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
+
+gunzip -kc Chr01K.polyploid.CDS.allsamps.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.allsamps.vcf_
+
+``` 
+
+## Generate NA distance matrices
+
+```
+
+Rscript DIR/generate_NA_dist_mat.r 
+
+```
+
+
+## Make List of 4X and 8X samples
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+ploidy_meta_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/ploidy_calling/sg_ploidy_results_v2.0.txt'
+
+ploidy_meta <- read.table(ploidy_meta_file, header = T, stringsAsFactors = F,
+  sep = '\t')
+
+tet_libs <- ploidy_meta$lib[which(ploidy_meta$total_ploidy == '4X')]
+oct_libs <- ploidy_meta$lib[which(ploidy_meta$total_ploidy == '8X')]
+
+tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
+oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
+
+write.table(tet_libs, file = tet_lib_file, quote = F, row.names = F, 
+  col.names = F)
+write.table(oct_libs, file = oct_lib_file, quote = F, row.names = F, 
+  col.names = F)
+```
+## Test with 100k SNPs
+### Get SNPs with higher MAF
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
+
+head -100000 Chr01K.polyploid.vcf > Chr01K.polyploid_100k.vcf
+
+vcftools --vcf Chr01K.polyploid_100k.vcf --out Chr01K.pp100k_0.5Miss \
+--max-missing 0.5 --recode --recode-INFO-all
+```
+### CDS positions in 4X and 8X samples
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
+
+vcftools --vcf Chr01K.pp100k_0.5Miss.recode.vcf \
+--out Chr01K.pp100k_0.5Miss.4X.CDS \
+--keep \
+/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt \
+--bed /global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed \
+--recode --recode-INFO-all
+
+vcftools --vcf Chr01K.pp100k_0.5Miss.recode.vcf \
+--out Chr01K.pp100k_0.5Miss.8X.CDS \
+--keep \
+/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt \
+--bed /global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed \
+--recode --recode-INFO-all
+
+```
+
+### Generate genotypes for eventual distance matrix
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+octo_geno_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/Chr01K.pp100k_0.5Miss.8X.CDS.recode.vcf'
+
+octo_vcf <- read.table(octo_geno_file, skip = 4, stringsAsFactors = F, 
+  sep = '\t', header = T, comment.char = '@')
+
+oct_geno_mat <- octo_vcf[, c(10:ncol(octo_vcf))]
+oct_geno_mat[oct_geno_mat == './.'] <- NA
+
+oct_geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
+oct_dosage_vec <- c('2', '1.5', '1', '0.5', '0')
+
+for(i in seq(length(oct_geno_vec))){
+  oct_geno_mat[oct_geno_mat == oct_geno_vec[i]] <- oct_dosage_vec[i]
+}
+
+tet_geno_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/Chr01K.pp100k_0.5Miss.4X.CDS.recode.vcf'
+
+tet_vcf <- read.table(tet_geno_file, skip = 4, stringsAsFactors = F, 
+  sep = '\t', header = T, comment.char = '@')
+
+tet_geno_mat <- tet_vcf[, c(10:ncol(tet_vcf))]
+tet_geno_mat[tet_geno_mat == './.'] <- NA
+
+tet_geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
+tet_dosage_vec <- c('2', '1', '1', '1', '0')
+
+for(i in seq(length(tet_geno_vec))){
+  tet_geno_mat[tet_geno_mat == tet_geno_vec[i]] <- tet_dosage_vec[i]
+}
+
+```
+
 
 
