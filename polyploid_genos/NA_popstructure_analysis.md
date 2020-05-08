@@ -9,24 +9,21 @@ missing data) and 0.8 (20% missing data)
 
 ## Generate NA Distance Matrices
 ```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/na_popstructure/all_samps/no_filtering
 
-DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps/
+sbatch gen_NA_dists_test.sh
+sbatch gen_Chr01K_NA_dists.sh
 
-CHROM=01K
-VCF_MEAT=.polyploid.CDS.allsamps.vcf_
-SUB_NUM=00
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/na_popstructure/all_samps/few_missing
+sbatch gen_Chr01K_few_miss_NA_dists.sh
 
-VCF_IN=$DATA_DIR'Chr'$CHROM$VCF_MEAT$SUB_NUM
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/na_popstructure/all_samps/half_missing
+sbatch gen_Chr01K_half_miss_NA_dists.sh
 
-HEADER_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/full_vcf_header.txt
-
-OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/na_popstructure/all_samps/no_filtering/
-
-Rscript DIR/generate_NA_dist_mat.r $VCF_IN $HEADER_FILE $OUT_DIR
-
-
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/na_popstructure/all_samps/high_missing
+sbatch gen_Chr01K_high_miss_NA_dists.sh
 ```
+
+
 
 
