@@ -149,42 +149,4 @@ vcftools --vcf Chr01K.pp100k_0.5Miss.recode.vcf \
 
 ```
 
-### Generate genotypes for eventual distance matrix
-```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
-
-octo_geno_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/Chr01K.pp100k_0.5Miss.8X.CDS.recode.vcf'
-
-octo_vcf <- read.table(octo_geno_file, skip = 4, stringsAsFactors = F, 
-  sep = '\t', header = T, comment.char = '@')
-
-oct_geno_mat <- octo_vcf[, c(10:ncol(octo_vcf))]
-oct_geno_mat[oct_geno_mat == './.'] <- NA
-
-oct_geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
-oct_dosage_vec <- c('2', '1.5', '1', '0.5', '0')
-
-for(i in seq(length(oct_geno_vec))){
-  oct_geno_mat[oct_geno_mat == oct_geno_vec[i]] <- oct_dosage_vec[i]
-}
-
-tet_geno_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/Chr01K.pp100k_0.5Miss.4X.CDS.recode.vcf'
-
-tet_vcf <- read.table(tet_geno_file, skip = 4, stringsAsFactors = F, 
-  sep = '\t', header = T, comment.char = '@')
-
-tet_geno_mat <- tet_vcf[, c(10:ncol(tet_vcf))]
-tet_geno_mat[tet_geno_mat == './.'] <- NA
-
-tet_geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
-tet_dosage_vec <- c('2', '1', '1', '1', '0')
-
-for(i in seq(length(tet_geno_vec))){
-  tet_geno_mat[tet_geno_mat == tet_geno_vec[i]] <- tet_dosage_vec[i]
-}
-
-```
-
-
 

@@ -19,11 +19,14 @@
 
 ###############
 # OUTPUT
-# List with 2 elements:
+# List with 4 elements:
 # [['nSNPS']] = the number of SNPs used to calculate the distance
-# [['euclidean_dist']] = euclidean distance matrix based on NA's of the SNPs
-#		NA's are given 0, present genotypes are given 1
-#		Distance matrix is generated based on the matrix of 0's and 1's
+# [['euclidean_dist']] = euclidean distance matrix based on dosage genotypes
+# [['manhattan_dist']] = manhattan distance matrix based on dosage genotypes
+# [['n_NAs']] = the number of NA genotypes in each sample; NA's are removed
+#                       from distance calculations and normalized to nSNPs, so
+#                       these values can help determine if/how missing data
+#                       may be affecting results
 ###############
 
 # module load python/3.7-anaconda-2019.07

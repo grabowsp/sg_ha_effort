@@ -15,8 +15,9 @@
 
 ###############
 # OUTPUT
-# List with 2 elements:
+# List with 4 elements:
 # [['nSNPS']] = the number of SNPs used to calculate the distance
+# [['euclidean_dist']] = euclidean distance matrix based on dosage genotypes
 # [['manhattan_dist']] = manhattan distance matrix based on dosage genotypes
 # [['n_NAs']] = the number of NA genotypes in each sample; NA's are removed
 #                       from distance calculations and normalized to nSNPs, so
