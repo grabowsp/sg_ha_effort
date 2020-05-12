@@ -6,23 +6,23 @@
 # bash
 # source activate r_phylo
 
-#args = commandArgs(trailingOnly = TRUE)
+args = commandArgs(trailingOnly = TRUE)
 
 # LOAD PACKAGES #
 library(phangorn)
 
 ### LOAD DATA ###
-#data_file <- args[1]
-data_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_genos_popstructure/polyploid_dists/',
-  'Chr01K.polyploid.CDS.allsamps.few_miss_00_ploidy_DistMat.rds', sep = '')
+data_file <- args[1]
+#data_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+#  'polyploid_genos_popstructure/polyploid_dists/',
+#  'Chr01K.polyploid.CDS.allsamps.few_miss_00_ploidy_DistMat.rds', sep = '')
 
 data <- readRDS(data_file)
 
-#ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/', 
-#  'ploidy_calling/sg_ploidy_results_v2.0.txt', sep = '')
-ploidy_info_file <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/',
-  'pseudohap/sg_ploidy_results_v2.0.txt', sep = '')
+ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/', 
+  'ploidy_calling/sg_ploidy_results_v2.0.txt', sep = '')
+#ploidy_info_file <- paste('/home/t4c1/WORK/grabowsk/data/switchgrass/',
+#  'pseudohap/sg_ploidy_results_v2.0.txt', sep = '')
 ploidy_info <- read.table(ploidy_info_file, header = T, sep = '\t',
   stringsAsFactors = F)
 
