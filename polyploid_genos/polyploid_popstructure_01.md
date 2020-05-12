@@ -38,17 +38,56 @@ sbatch gen_tetrasomic_dists_Chr01K.sh
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
+SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
+
+# polyploid distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
+
 DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/
-
 FILE_SUF=ploidy_DistMat.rds
-
 OUT_FILE=Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
 
-Rscript /PATH/combine_dists.r $DATA_DIR $FILE_SUF $OUT_FILE
+Rscript $SCRIPT_DIR'/combine_dists.r' $DATA_DIR $FILE_SUF $OUT_FILE
+
+# disomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/
+FILE_SUF=disomic_DistMat.rds
+OUT_FILE=Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds
+
+Rscript $SCRIPT_DIR'/combine_dists.r' $DATA_DIR $FILE_SUF $OUT_FILE
+
+# tetrasomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/
+FILE_SUF=tetrasomic_DistMat.rds
+OUT_FILE=Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds
+
+Rscript $SCRIPT_DIR'/combine_dists.r' $DATA_DIR $FILE_SUF $OUT_FILE
+```
+
+## Generate General PCoA Figures
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
+
+# polyploid distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
+
+Rscript $SCRIPT_DIR'/combine_dists.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
+
 
 
 ```
-
 
 ## Next Steps
 * `combine_dists.r` to combine the distance matrices from each data type

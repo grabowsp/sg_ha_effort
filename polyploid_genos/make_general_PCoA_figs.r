@@ -3,7 +3,7 @@
 # module load python/3.7-anaconda-2019.07
 # source activate R_analysis
 
-#args = commandArgs(trailingOnly = TRUE)
+args = commandArgs(trailingOnly = TRUE)
 
 # LOAD PACKAGES #
 # library(phangorn)
@@ -11,10 +11,10 @@ library(ggplot2)
 library(patchwork)
 
 ### LOAD DATA ###
-#data_file <- args[1]
-data_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/', 
-  'polyploid_genos_popstructure/polyploid_dists/', 
-  'Chr01K.polyploid.CDS.allsamps.few_miss_00_ploidy_DistMat.rds', sep = '')
+data_file <- args[1]
+#data_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/', 
+#  'polyploid_genos_popstructure/polyploid_dists/', 
+#  'Chr01K.polyploid.CDS.allsamps.few_miss_00_ploidy_DistMat.rds', sep = '')
 
 data <- readRDS(data_file)
 
