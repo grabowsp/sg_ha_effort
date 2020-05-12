@@ -82,10 +82,10 @@ SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
 
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
 
-Rscript $SCRIPT_DIR'/combine_dists.r' \
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
 /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
 
-
+# need to figure out why all the plots are the same 2 columns...
 
 ```
 

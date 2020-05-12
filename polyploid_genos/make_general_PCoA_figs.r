@@ -84,8 +84,12 @@ euc_df$totPloid <- ploidy_info$total_ploidy[meta_ord]
 
 pcoX <- 1
 pcoY <- 2
+# using the variable to call columns for x and y doesn't work; so hard-coding
+## it for now
+# might be because use SUBPOP for color?.
+# in future can try calling df columns all in the same way
 
-gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 2])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)', 
     sep = '')) +
@@ -93,7 +97,7 @@ gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_2_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_2_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 2])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -106,7 +110,7 @@ gg_1_2_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
 pcoX <- 1
 pcoY <- 3
 
-gg_1_3_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_3_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 3])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -114,7 +118,7 @@ gg_1_3_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_3_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_3_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 3])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -127,7 +131,7 @@ gg_1_3_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
 pcoX <- 1
 pcoY <- 4
 
-gg_1_4_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_4_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 4])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -135,7 +139,7 @@ gg_1_4_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_4_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_4_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 4])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -148,7 +152,7 @@ gg_1_4_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
 pcoX <- 1
 pcoY <- 5
 
-gg_1_5_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_5_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 5])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
@@ -156,7 +160,7 @@ gg_1_5_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_5_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
+gg_1_5_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 5])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
