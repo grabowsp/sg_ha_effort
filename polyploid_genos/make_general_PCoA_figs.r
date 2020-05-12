@@ -87,17 +87,17 @@ pcoY <- 2
 
 gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)', 
+  xlab(paste('PCo_', pcoX, ' (', euc_per_var[pcoX], 2), '%)', 
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)', 
+  ylab(paste('PCo_', pcoY, ' (', euc_per_var[pcoY], 2), '%)', 
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
 gg_1_2_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -108,17 +108,17 @@ pcoY <- 3
 
 gg_1_3_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
 gg_1_3_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -129,17 +129,17 @@ pcoY <- 4
 
 gg_1_4_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
 gg_1_4_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -150,17 +150,17 @@ pcoY <- 5
 
 gg_1_5_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
 gg_1_5_p <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(cmd_var_list[[1]][pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(cmd_var_list[[1]][pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
