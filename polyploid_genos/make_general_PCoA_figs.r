@@ -30,7 +30,7 @@ out_file <- gsub('.rds', '_general_PCoAs.pdf', data_file)
 # SET VARIABLES #
 
 plot_title_pre <- args[2]
-plot_title_pre <- 'Polyploid Genotypes'
+#plot_title_pre <- 'Polyploid_Genotypes'
 
 ############
 ### Set Colors
@@ -86,8 +86,9 @@ pcoX <- 1
 pcoY <- 2
 # using the variable to call columns for x and y doesn't work; so hard-coding
 ## it for now
-# might be because use SUBPOP for color?.
-# in future can try calling df columns all in the same way
+# seems to be because the last pcoX and pcoY variables are called during
+## plotting
+# Can try pasting the column names and then using column name characters
 
 gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 2])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
