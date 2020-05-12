@@ -87,9 +87,9 @@ pcoY <- 2
 
 gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, pcoX], y = euc_df[, pcoY])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', euc_per_var[pcoX], 2), '%)', 
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)', 
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', euc_per_var[pcoY], 2), '%)', 
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)', 
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
