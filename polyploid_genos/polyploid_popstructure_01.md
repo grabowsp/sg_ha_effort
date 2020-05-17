@@ -84,7 +84,11 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploi
 
 Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
 /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds \
-Polyploid_Genotypes
+manhattan Polyploid_Genotypes
+
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds \
+euclidean Polyploid_Genotypes
 
 # disomic distances
 
@@ -92,7 +96,11 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_
 
 Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
 /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds \
-Disomic_Genotypes
+manhattan Disomic_Genotypes
+
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds \
+euclidean Disomic_Genotypes
 
 # tetrasomic distances
 
@@ -100,10 +108,13 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasom
 
 Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
 /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds \
-Tetrasomic_Genotypes
+manhattan Tetrasomic_Genotypes
+
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds \
+euclidean Tetrasomic_Genotypes
 
 ```
-
 ## Make NJ Trees
 ```
 module load python3/3.7-anaconda-2019.10
@@ -116,23 +127,36 @@ SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
 
 Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
-/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds \
+manhattan
+
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds \
+euclidean
 
 # disomic distances
 
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists
 
 Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
-/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds \
+manhattan
+
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds \
+euclidean
 
 # tetrasomic distances
 
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists
 
 Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
-/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds \
+manhattan
 
-
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds \
+euclidean
 
 ```
 
