@@ -26,6 +26,8 @@ My NERSC location
   * use `read.table('Reseq_Metadata_Sept_2019_Edited_for_R.tsv', sep = '\t', \
 header = T, stringsAsFactors = F, quote = "", comment.char = '$')` \
 to load in R
+* Metadata from John - May 2020
+  * `genotype.metadata.May2020.rds`
 ### Switchgrass Cultivars in Reseq Data
 * Table of cultivars I found in the reseq data
   * Original file with lots of typos:

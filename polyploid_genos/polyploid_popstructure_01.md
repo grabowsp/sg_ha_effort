@@ -83,11 +83,60 @@ SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
 
 Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
-/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds \
+Polyploid_Genotypes
 
-# need to figure out why all the plots are the same 2 columns...
+# disomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists
+
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds \
+Disomic_Genotypes
+
+# tetrasomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists
+
+Rscript $SCRIPT_DIR'/make_general_PCoA_figs.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds \
+Tetrasomic_Genotypes
 
 ```
+
+## Make NJ Trees
+```
+module load python3/3.7-anaconda-2019.10
+source activate r_phylo_tools
+
+SCRIPT_DIR=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos
+
+# polyploid distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists
+
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/polyploid_dists/Chr01K.polyploid.CDS.allsamps.few_miss_ploidy_DistMat.total.rds
+
+# disomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists
+
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/disomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_disomic_DistMat.total.rds
+
+# tetrasomic distances
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists
+
+Rscript $SCRIPT_DIR'/make_standard_NJ_trees.r' \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_genos_popstructure/tetrasomic_dists/Chr01K.polyploid.CDS.allsamps.few_miss_tetrasomic_DistMat.total.rds
+
+
+
+```
+
+
 
 ## Next Steps
 * `combine_dists.r` to combine the distance matrices from each data type

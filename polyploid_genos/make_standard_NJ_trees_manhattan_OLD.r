@@ -1,4 +1,4 @@
-# Script for generating trees from manhattan or euclidean distances
+# Script for generating trees from the manhattan distances
 
 # module load python/3.7-anaconda-2019.07
 # source activate r_phylo_tools
@@ -26,30 +26,9 @@ ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
 ploidy_info <- read.table(ploidy_info_file, header = T, sep = '\t',
   stringsAsFactors = F)
 
-dist_type_in <- args[2]
-#dist_type_in <- 'manhattan'
-
-dt_first_letter <- unlist(strsplit(dist_type_in, split =''))[1]
-
-if(length(intersect(dt_first_letter, c('m', 'M'))) > 0){
-  dist_type <- 'manhattan_dist'
-  out_file_dist_suf <- 'manDist'}
-if(length(intersect(dt_first_letter, c('e', 'E'))) > 0){
-  dist_type <- 'euclidean_dist'
-  out_file_dist_suf <- 'eucDist'}
-if(length(intersect(dt_first_letter, c('m', 'M', 'e', 'E'))) == 0){
-  print('Must indicate if using manhattan or euclidean distance')
-  quit()
-}
-
 ### SET OUTPUTS ###
-
-out_file_pre <- gsub('.rds', '', data_file)
-
-out_file_subpop <- paste(out_file_pre, out_file_dist_suf, 
-  'subpop_colors.NJ_tree.pdf', sep = '.')
-out_file_ploidy <-  paste(out_file_pre, out_file_dist_suf, 
-  'ploidy_colors.NJ_tree.pdf', sep = '.')
+out_file_subpop <- gsub('.rds', '.subpop_colors.NJ_tree.pdf', data_file)
+out_file_ploidy <- gsub('.rds', '.ploidy_colors.NJ_tree.pdf', data_file)
 
 # SET VARIABLES #
 
@@ -78,7 +57,7 @@ totPloid_col_vec['8X'] <- 'blue2'
 
 # Make Euclidean-distance PCoA data.frames
 
-dist_mat <- as.matrix(data[[dist_type]])
+dist_mat <- as.matrix(data[['manhattan_dist']])
 
 meta_ord <- c()
 for(j in seq(nrow(dist_mat))){

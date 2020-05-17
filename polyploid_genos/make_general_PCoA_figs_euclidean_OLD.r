@@ -1,4 +1,4 @@
-# Script for generating PCoA figs from either manhattan or euclidean distances
+# Script for generating PCoA figs from the euclidean distances
 
 # module load python/3.7-anaconda-2019.07
 # source activate R_analysis
@@ -23,31 +23,13 @@ ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
 ploidy_info <- read.table(ploidy_info_file, header = T, sep = '\t',
   stringsAsFactors = F)
 
-dist_type_in <- args[2]
-#dist_type_in <- 'manhattan'
-
-dt_first_letter <- unlist(strsplit(dist_type_in, split =''))[1]
-
-if(length(intersect(dt_first_letter, c('m', 'M'))) > 0){
-  dist_type <- 'manhattan_dist'
-  out_file_dist_suf <- 'manDist'}
-if(length(intersect(dt_first_letter, c('e', 'E'))) > 0){
-  dist_type <- 'euclidean_dist'
-  out_file_dist_suf <- 'eucDist'}
-if(length(intersect(dt_first_letter, c('m', 'M', 'e', 'E'))) == 0){
-  print('Must indicate if using manhattan or euclidean distance')
-  quit()
-}
-
 ### SET OUTPUTS ###
-out_file_pre <- gsub('.rds', '', data_file)
 
-out_file <- paste(out_file_pre, out_file_dist_suf,
-  'general_PCoAs.pdf', sep = '.')
+out_file <- gsub('.rds', '_general_PCoAs.pdf', data_file)
 
 # SET VARIABLES #
 
-plot_title_pre <- args[3]
+plot_title_pre <- args[2]
 #plot_title_pre <- 'Polyploid_Genotypes'
 
 ############
@@ -78,27 +60,27 @@ totPloid_col_vec['8X'] <- 'blue2'
 ploidy_palette <- scale_colour_manual(name = 'Ploidy', 
   values = totPloid_col_vec)
 
-# Make PCoA data.frames
+# Make Euclidean-distance PCoA data.frames
 
-dist_mat <- as.matrix(data[[dist_type]])
+euc_dist_mat <- as.matrix(data[['euclidean_dist']])
 
-dist_cmd <- cmdscale(dist_mat, k = 200)
-dist_tot_var <- sum(apply(dist_cmd, 2, var))
-dist_per_var <- (apply(dist_cmd, 2, var)/dist_tot_var)*100
+euc_cmd <- cmdscale(euc_dist_mat, k = 200)
+euc_tot_var <- sum(apply(euc_cmd, 2, var))
+euc_per_var <- (apply(euc_cmd, 2, var)/euc_tot_var)*100
 
-dist_df <- data.frame(dist_cmd, stringsAsFactors = F)
-colnames(dist_df) <- paste('PCo_', seq(ncol(dist_df)), sep = '')
+euc_df <- data.frame(euc_cmd, stringsAsFactors = F)
+colnames(euc_df) <- paste('PCo_', seq(ncol(euc_df)), sep = '')
 
 meta_ord <- c()
-for(j in seq(nrow(dist_mat))){
-  tmp_ind <- which(ploidy_info$lib == rownames(dist_mat)[j])
+for(j in seq(nrow(euc_dist_mat))){
+  tmp_ind <- which(ploidy_info$lib == rownames(euc_dist_mat)[j])
   meta_ord <- c(meta_ord, tmp_ind)
 }
 
-dist_df$samp <- paste(ploidy_info$lib, 
+euc_df$samp <- paste(ploidy_info$lib, 
   ploidy_info$PLANT_ID, sep = '_')[meta_ord]
-dist_df$SUBPOP <- ploidy_info$SUBPOP_SNP[meta_ord]
-dist_df$totPloid <- ploidy_info$total_ploidy[meta_ord]
+euc_df$SUBPOP <- ploidy_info$SUBPOP_SNP[meta_ord]
+euc_df$totPloid <- ploidy_info$total_ploidy[meta_ord]
 
 pcoX <- 1
 pcoY <- 2
@@ -108,19 +90,19 @@ pcoY <- 2
 ## plotting
 # Can try pasting the column names and then using column name characters
 
-gg_1_2_s <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 2])) +
+gg_1_2_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 2])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)', 
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)', 
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)', 
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)', 
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_2_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 2])) +
+gg_1_2_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 2])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -129,19 +111,19 @@ gg_1_2_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 2])) +
 pcoX <- 1
 pcoY <- 3
 
-gg_1_3_s <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 3])) +
+gg_1_3_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 3])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_3_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 3])) +
+gg_1_3_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 3])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -150,19 +132,19 @@ gg_1_3_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 3])) +
 pcoX <- 1
 pcoY <- 4
 
-gg_1_4_s <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 4])) +
+gg_1_4_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 4])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_4_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 4])) +
+gg_1_4_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 4])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
@@ -171,19 +153,19 @@ gg_1_4_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 4])) +
 pcoX <- 1
 pcoY <- 5
 
-gg_1_5_s <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 5])) +
+gg_1_5_s <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 5])) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 
-gg_1_5_p <- ggplot(dist_df, aes(x = dist_df[, 1], y = dist_df[, 5])) +
+gg_1_5_p <- ggplot(euc_df, aes(x = euc_df[, 1], y = euc_df[, 5])) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab(paste('PCo_', pcoX, ' (', round(dist_per_var[pcoX], 2), '%)',
+  xlab(paste('PCo_', pcoX, ' (', round(euc_per_var[pcoX], 2), '%)',
     sep = '')) +
-  ylab(paste('PCo_', pcoY, ' (', round(dist_per_var[pcoY], 2), '%)',
+  ylab(paste('PCo_', pcoY, ' (', round(euc_per_var[pcoY], 2), '%)',
     sep = '')) +
   ggtitle(paste(plot_title_pre, ' PCo_', pcoX, ' vs PCo_', pcoY, sep = ''))
 

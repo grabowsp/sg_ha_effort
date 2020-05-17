@@ -1,4 +1,4 @@
-# Script for generating PCoA figs from either manhattan or euclidean distances
+# Script for generating PCoA figs from the euclidean distances
 
 # module load python/3.7-anaconda-2019.07
 # source activate R_analysis
@@ -23,31 +23,13 @@ ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
 ploidy_info <- read.table(ploidy_info_file, header = T, sep = '\t',
   stringsAsFactors = F)
 
-dist_type_in <- args[2]
-#dist_type_in <- 'manhattan'
-
-dt_first_letter <- unlist(strsplit(dist_type_in, split =''))[1]
-
-if(length(intersect(dt_first_letter, c('m', 'M'))) > 0){
-  dist_type <- 'manhattan_dist'
-  out_file_dist_suf <- 'manDist'}
-if(length(intersect(dt_first_letter, c('e', 'E'))) > 0){
-  dist_type <- 'euclidean_dist'
-  out_file_dist_suf <- 'eucDist'}
-if(length(intersect(dt_first_letter, c('m', 'M', 'e', 'E'))) == 0){
-  print('Must indicate if using manhattan or euclidean distance')
-  quit()
-}
-
 ### SET OUTPUTS ###
-out_file_pre <- gsub('.rds', '', data_file)
 
-out_file <- paste(out_file_pre, out_file_dist_suf,
-  'general_PCoAs.pdf', sep = '.')
+out_file <- gsub('.rds', '_general_PCoAs_manhatDists.pdf', data_file)
 
 # SET VARIABLES #
 
-plot_title_pre <- args[3]
+plot_title_pre <- args[2]
 #plot_title_pre <- 'Polyploid_Genotypes'
 
 ############
@@ -80,7 +62,7 @@ ploidy_palette <- scale_colour_manual(name = 'Ploidy',
 
 # Make PCoA data.frames
 
-dist_mat <- as.matrix(data[[dist_type]])
+dist_mat <- as.matrix(data[['manhattan_dist']])
 
 dist_cmd <- cmdscale(dist_mat, k = 200)
 dist_tot_var <- sum(apply(dist_cmd, 2, var))

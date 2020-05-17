@@ -106,6 +106,51 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
 sbatch generate_Chr01_CDS_MissFilt.sh
 ```
 
+## Generate CDS VCF for natural samples
+* maximum 20% missing data
+### Generate list of geographic sample libraries
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+meta_file <- '/global/homes/g/grabowsp/data/switchgrass/reseq_metadata/genotype.metadata.May2020.rds'
+
+meta <- readRDS(meta_file)
+# use this to chose "Climate" samples for 4X samples
+
+# 1) "good" libraries
+good_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/samp901_lib_names.txt'
+good_libs <- read.table(good_lib_file, header = F, stringsAsFactors = F)
+
+good_inds <- which(meta$LIBRARY %in% good_libs[,1])
+
+# 4X samples chosen for climate analysis
+tet_clim_libs <- which(meta$LIB_CLIMATE == 'Y')
+
+# presumptive 8X samples that come from natural collections
+other_clim_libs <- intersect(
+  which(meta$COLLECTION_TYPE == 'Natural Collection'),
+  which(meta$LIB_CLIMATE == 'NA'))
+
+good_clim_libs <- intersect(good_inds, union(tet_clim_libs, other_clim_libs))
+
+out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/geo837_lib_names.txt'
+
+write.table(meta$LIBRARY[good_clim_libs], file = out_file, quote = F, 
+  sep = '\t', row.names = F, col.names = F)
+
+```
+### Make VCFs
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+
+sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
+```
+
+
+
+
+
 ## Unzip vcfs
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
