@@ -23,27 +23,6 @@
 * CDS VCFs with 901 "good" samples
   `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps`
 
-## Make List of 4X and 8X samples
-```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
-
-ploidy_meta_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/ploidy_calling/sg_ploidy_results_v2.0.txt'
-
-ploidy_meta <- read.table(ploidy_meta_file, header = T, stringsAsFactors = F,
-  sep = '\t')
-
-tet_libs <- ploidy_meta$lib[which(ploidy_meta$total_ploidy == '4X')]
-oct_libs <- ploidy_meta$lib[which(ploidy_meta$total_ploidy == '8X')]
-
-tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
-oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
-
-write.table(tet_libs, file = tet_lib_file, quote = F, row.names = F, 
-  col.names = F)
-write.table(oct_libs, file = oct_lib_file, quote = F, row.names = F, 
-  col.names = F)
-```
 
 ## Generate CDS VCFs for each chromosome
 ```
@@ -108,90 +87,39 @@ sbatch generate_Chr01_CDS_MissFilt.sh
 
 ## Generate CDS VCF for natural samples
 * maximum 20% missing data
-### Generate list of geographic sample libraries
-```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
-
-meta_file <- '/global/homes/g/grabowsp/data/switchgrass/reseq_metadata/genotype.metadata.May2020.rds'
-
-meta <- readRDS(meta_file)
-# use this to chose "Climate" samples for 4X samples
-
-# 1) "good" libraries
-good_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/samp901_lib_names.txt'
-good_libs <- read.table(good_lib_file, header = F, stringsAsFactors = F)
-
-good_inds <- which(meta$LIBRARY %in% good_libs[,1])
-
-# 4X samples chosen for climate analysis
-tet_clim_libs <- which(meta$LIB_CLIMATE == 'Y')
-
-# presumptive 8X samples that come from natural collections
-other_clim_libs <- intersect(
-  which(meta$COLLECTION_TYPE == 'Natural Collection'),
-  which(meta$LIB_CLIMATE == 'NA'))
-
-good_clim_libs <- intersect(good_inds, union(tet_clim_libs, other_clim_libs))
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/geo837_lib_names.txt'
-
-write.table(meta$LIBRARY[good_clim_libs], file = out_file, quote = F, 
-  sep = '\t', row.names = F, col.names = F)
-
-```
-### Make VCFs
+* Samples sets (on Cori):
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo826_lib_names.txt`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo_expand_839_lib_names.txt`
+  * Description and code here:
+    * `~/sg_ha_effort/samp_set_explanations.md`
+### Make Climate VCFs
+#### No 8X cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
 ```
-
-
-
-
-
-## Unzip vcfs
+#### Include 8X cultivars
 ```
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
-sbatch unzip_Chr01K.sh
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+
+sbatch generate_Chr01K_01N_CDS_expandgeosamps_vcf.sh
 ```
 
-
-## Test with 100k SNPs
-### Get SNPs with higher MAF
+### Divide VCFs
+#### Without 8X Cultivars
 ```
-module load python/3.7-anaconda-2019.07
-source activate gen_bioinformatics
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
-
-head -100000 Chr01K.polyploid.vcf > Chr01K.polyploid_100k.vcf
-
-vcftools --vcf Chr01K.polyploid_100k.vcf --out Chr01K.pp100k_0.5Miss \
---max-missing 0.5 --recode --recode-INFO-all
+gunzip -kc Chr01K.polyploid.CDS.geosamps.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.geosamps.vcf_
 ```
-### CDS positions in 4X and 8X samples
+#### With 8X Cultivars
 ```
-module load python/3.7-anaconda-2019.07
-source activate gen_bioinformatics
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs
-
-vcftools --vcf Chr01K.pp100k_0.5Miss.recode.vcf \
---out Chr01K.pp100k_0.5Miss.4X.CDS \
---keep \
-/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt \
---bed /global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed \
---recode --recode-INFO-all
-
-vcftools --vcf Chr01K.pp100k_0.5Miss.recode.vcf \
---out Chr01K.pp100k_0.5Miss.8X.CDS \
---keep \
-/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt \
---bed /global/cscratch1/sd/grabowsp/sg_ploidy/genic_positions/sg_v5_CDS.bed \
---recode --recode-INFO-all
-
+gunzip -kc Chr01K.polyploid.CDS.expandgeosamps.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.expandgeosamps.vcf_
 ```
 
 

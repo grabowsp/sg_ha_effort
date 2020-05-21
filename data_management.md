@@ -41,6 +41,6 @@ to load in R
   * This turned out to only have the punitive 4X (not totally correct) samples
 
 ## Ploidy info
-* `/global/cscratch1/sd/grabowsp/sg_ploidy/ploidy_calling/sg_ploidy_results_v1.0.txt`
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/ploidy_calling/sg_ploidy_results_v3.0.txt`
 
  

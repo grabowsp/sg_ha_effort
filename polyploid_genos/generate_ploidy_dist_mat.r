@@ -49,12 +49,14 @@ vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
 colnames(vcf) <- vcf_header
 
 tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
-tet_libs <- as.vector(read.table(tet_lib_file, header = F, 
+tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F, 
   stringsAsFactors = F)[,1])
+tet_libs <- intersect(tet_libs_0, colnames(vcf))
 
 oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
-oct_libs <- as.vector(read.table(oct_lib_file, header = F, 
+oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F, 
   stringsAsFactors = F)[,1])
+oct_libs <- intersect(oct_libs_0, colnames(vcf))
 
 ### SET OUTPUTS ###
 out_dir <- args[3]
