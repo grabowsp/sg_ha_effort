@@ -121,5 +121,18 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 gunzip -kc Chr01K.polyploid.CDS.expandgeosamps.vcf.gz | \
 split -l 100000 -d - Chr01K.polyploid.CDS.expandgeosamps.vcf_
 ```
+### Generate VCFs headers
+#### Without 8X Cultivars
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+head -5 Chr01K.polyploid.CDS.geosamps.vcf_00 | tail -1 > \
+CDS.geosamps.vcf.header.txt
+```
+#### With 8X Cultivars
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+head -5 Chr01K.polyploid.CDS.expandgeosamps.vcf_00 | tail -1 > \
+CDS.expandgeosamps.vcf.header.txt
+```
 
 

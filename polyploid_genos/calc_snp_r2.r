@@ -9,12 +9,12 @@ args = commandArgs(trailingOnly = TRUE)
 
 ### LOAD INPUTS ###
 vcf_in <- args[1]
-#vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/Chr01K.polyploid_100k.vcf'
+#vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
 
 vcf <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
 
 vcf_header_file <- args[2]
-#vcf_header_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/full_vcf_header.txt'
+#vcf_header_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt'
 
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
   sep = '\t', header = F, comment.char = '@'))
@@ -40,14 +40,19 @@ out_file <- paste(out_dir, file_pre, out_suffix, sep = '')
 
 ### SET VARIABLES ###
 # first column with sample genotypes
-FIRST_SAMP = 4
+FIRST_SAMP = 10
 
 # maximum distance in bp to measure LD
 max_dist <- as.numeric(args[4])
+#max_dist <- 10000
+
+# minimum minor allele frequency
+maf_cut <- as.numeric(args[5])
+#maf_cut <- 0.05
 
 ### FUNCTIONS (to be saved in another file? ###
-calc_snp_r2 <- function(vcf_df, max_dist, pos_column = 'pos', 
-  name_column = 'rs', samp1_column = 4){
+calc_snp_r2 <- function(vcf_df, max_dist, pos_column = 'POS', 
+  name_column = 'ID', samp1_column = FIRST_SAMP){
   #########
   r2_list <- list()
   for(tm in seq(nrow(vcf_df))){
@@ -94,10 +99,38 @@ for(i in seq(length(geno_vec))){
 }
 
 for(i in c(FIRST_SAMP:ncol(vcf))){
-  oct_df[, i] <- as.numeric(oct_df[, i])
+  vcf[, i] <- as.numeric(vcf[, i])
 }
 
-vcf_r2 <- cal_snp_r2(vcf_df = vcf, max_dist = max_dist)
+# Filter VCF based on maf
+n_nas <- apply( vcf[, c(FIRST_SAMP:ncol(vcf))], 1,
+  function(x) sum(is.na(unlist(x))))
+
+n_gsamps <- length(c(FIRST_SAMP:ncol(vcf))) - n_nas
+
+sum_ref <- apply( vcf[ , c(FIRST_SAMP:ncol(vcf))], 1,
+  function(x) sum(unlist(x), na.rm = T))
+
+allele_freq <- sum_ref / (2*n_gsamps)
+allele_freq_1 <- 1-allele_freq
+
+minor_af <- apply(cbind(allele_freq, allele_freq_1), 1, function(x) min(x)[1])
+
+if(sum(minor_af < maf_cut) > 0){
+  vcf_1 <- vcf[-which(minor_af < maf_cut), ]
+}else{vcf_1 <- vcf}
+
+# Filter out any non-variant SNPs, if they exist
+n_genos <- apply(vcf_1[ , c(FIRST_SAMP:ncol(vcf_1))], 1, 
+  function(x) length(table(unlist(x))))
+
+if(sum(n_genos==1) > 0) {
+  vcf_2 <- vcf_1[-which(n_genos == 1), ]
+}else{vcf_2 <- vcf_1}
+
+#test <- calc_snp_r2(vcf_df = vcf_1[1:10000,], max_dist = max_dist)
+
+vcf_r2 <- calc_snp_r2(vcf_df = vcf_2, max_dist = max_dist)
 
 saveRDS(vcf_r2, out_file)
 
