@@ -98,12 +98,16 @@ sbatch generate_Chr01_CDS_MissFilt.sh
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
+sbatch generate_Chr02_Chr05_CDS_geosamps_vcf.sh
+sbatch generate_Chr06_Chr09_CDS_geosamps_vcf.sh
 ```
 #### Include 8X cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
 sbatch generate_Chr01K_01N_CDS_expandgeosamps_vcf.sh
+sbatch generate_Chr02_Chr05_CDS_expandgeosamps_vcf.sh
+sbatch generate_Chr06_Chr09_CDS_expandgeosamps_vcf.sh
 ```
 
 ### Divide VCFs
