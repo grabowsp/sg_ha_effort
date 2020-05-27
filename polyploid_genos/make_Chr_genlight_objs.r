@@ -23,25 +23,36 @@ source activate r_adegenet_env
 library(adegenet)
 library(parallel)
 
-gen_function_file <- '/home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/general_functions.r'
+# on HA: gen_function_file <- '/home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/general_functions.r'
+# on Cori
+gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
 source(gen_function_file)
 
+adeg_function_file <- 
 
 ### IMPORT DATA
 
 #vcf_in_0 <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
 #vcf_0 <- read.table(vcf_in_0, header = F, stringsAsFactors = F, sep = '\t')
 
-data_dir <- ags[1]
+#data_dir <- ags[1]
 data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/'
 
+data_dir <- add_slash(data_dir)
 
+#vcf_search_string <- args[2]
+vcf_search_string <- 'Chr01K.polyploid.CDS.geosamps.vcf_*'
 
-vcf_files <- system('ls /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_*', inter = T)
+vcf_search_command <- paste('ls ', data_dir, vcf_search_string, sep = '')
+
+vcf_files <- system(vcf_search_command, inter = T)
+
+#vcf_files <- system('ls /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_*', inter = T)
 
 vcf_1 <- read.table(vcf_files[1], header = F, stringsAsFactors = F, 
     sep = '\t')
 
+#vcf_header_file <- args[3]
 vcf_header_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt'
 
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
@@ -59,80 +70,10 @@ oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
   stringsAsFactors = F)[,1])
 oct_libs <- intersect(oct_libs_0, vcf_header)
 
+# maf_cut <- args[4]
 maf_cut <- 0.002
 
 #######
-gen_gl_preobj <- function(vcf, oct_libs = c(), tet_libs = c(), 
-  maf_cut = 0.001){
-  # Function for filtering vcf by maf freq and generating necessary
-  #  objects to be used for making a "genlight" object
-  # INPUTS
-  # vcf = inputted vcf with header
-  # oct_libs = names of 8X libraries
-  # tet_libs = names of 4X libraries
-  # maf_cut = minor allele frequency cutoff
-  #########
-  geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
-  oct_alt_dose_vec <- c('0', '1', '2', '3', '4')
-  tet_alt_dose_vec <- c('0', '1', '1', '1', '2')
-  #
-  if(length(oct_libs) > 0){
-    oct_df <- vcf[, oct_libs]
-    oct_df[oct_df == './.'] <- NA
-    for(i in seq(length(geno_vec))){
-      oct_df[oct_df == geno_vec[i]] <- oct_alt_dose_vec[i]
-    }
-    for(j8 in seq(ncol(oct_df))){
-      oct_df[, j8] <- as.numeric(oct_df[, j8])
-    }
-    sum_alt_8 <- apply(oct_df, 1, function(x) sum(unlist(x), na.rm = T))
-  } else{sum_alt_8 <- c()}
-  #
-  if(length(tet_libs) > 0){
-    tet_df <- vcf[, tet_libs]
-    tet_df[tet_df == './.'] <- NA
-    for(i in seq(length(geno_vec))){
-      tet_df[tet_df == geno_vec[i]] <- tet_alt_dose_vec[i]
-    }
-    for(j4 in seq(ncol(tet_df))){
-      tet_df[, j4] <- as.numeric(tet_df[, j4])
-    }
-    sum_alt_4 <- apply(tet_df, 1, function(x) sum(unlist(x), na.rm = T))
-  } else{sum_alt_4 <- c()}
-  #
-  if(length(oct_libs) == 0){
-    tot_df <- tet_df
-    sum_alt_total <- sum_alt_4
-  } else if(length(tet_libs) == 0){
-    tot_df <- oct_df
-    sum_alt_total <- sum_alt_8/2
-  } else{
-    tot_df <- cbind(oct_df, tet_df)
-    sum_alt_total <- (sum_alt_8/2) + sum_alt_4
-  }
-  #
-  n_nas <- apply(tot_df, 1, function(x) sum(is.na(unlist(x))))
-  n_gsamps <- ncol(tot_df) - n_nas
-  allele_freq <- sum_alt_total / (2*n_gsamps)
-  allele_freq_1 <- 1 - allele_freq
-  minor_af <- apply(cbind(allele_freq, allele_freq_1), 1, function(x) min(x)[1])
-  remove_inds <- which(minor_af < maf_cut)
-  #
-  keep_inds <- setdiff(seq(nrow(vcf)), remove_inds)
-  #
-  preobj_ls <- list()
-  preobj_ls[['geno_mat']] <- tot_df[keep_inds, ]
-  preobj_ls[['loc.names']] <- vcf$ID[keep_inds]
-  preobj_ls[['chromosome']] <- vcf$CHROM[keep_inds]
-  preobj_ls[['position']] <- vcf$POS[keep_inds]
-  preobj_ls[['ploidy']] <- c(rep(4, times = length(oct_libs)), 
-    rep(2, times = length(tet_libs)))
-  preobj_ls[['loc.all']] <- paste(tolower(vcf$REF[keep_inds]), 
-    tolower(vcf$ALT[keep_inds]), sep = '/')
-  #
-  return(preobj_ls)
-}
-
 test_po_0 <- gen_gl_preobj(vcf = vcf_0, oct_libs = oct_libs, 
   tet_libs = tet_libs, maf_cut = maf_cut)
 
