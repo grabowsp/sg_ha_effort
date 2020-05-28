@@ -117,6 +117,23 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 gunzip -kc Chr01K.polyploid.CDS.geosamps.vcf.gz | \
 split -l 100000 -d - Chr01K.polyploid.CDS.geosamps.vcf_
+
+gunzip -kc Chr01N.polyploid.CDS.geosamps.vcf.gz | \
+split -l 100000 -d - Chr01N.polyploid.CDS.geosamps.vcf_
+
+for CN in {02..09};
+do
+gunzip -kc Chr$CN'K.polyploid.CDS.geosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'K.polyploid.CDS.geosamps.vcf_';
+done
+
+for CN in {02..09};
+do
+gunzip -kc Chr$CN'N.polyploid.CDS.geosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'N.polyploid.CDS.geosamps.vcf_';
+done
+
+
 ```
 #### With 8X Cultivars
 ```
@@ -124,6 +141,22 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 
 gunzip -kc Chr01K.polyploid.CDS.expandgeosamps.vcf.gz | \
 split -l 100000 -d - Chr01K.polyploid.CDS.expandgeosamps.vcf_
+
+gunzip -kc Chr01N.polyploid.CDS.expandgeosamps.vcf.gz | \
+split -l 100000 -d - Chr01N.polyploid.CDS.expandgeosamps.vcf_
+
+for CN in {02..09};
+do
+gunzip -kc Chr$CN'K.polyploid.CDS.expandgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'K.polyploid.CDS.expandgeosamps.vcf_';
+done
+
+for CN in {02..09};
+do
+gunzip -kc Chr$CN'N.polyploid.CDS.expandgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'N.polyploid.CDS.expandgeosamps.vcf_';
+done
+
 ```
 ### Generate VCFs headers
 #### Without 8X Cultivars
