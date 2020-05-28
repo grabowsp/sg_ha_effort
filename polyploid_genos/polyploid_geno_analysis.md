@@ -132,9 +132,8 @@ do
 gunzip -kc Chr$CN'N.polyploid.CDS.geosamps.vcf.gz' | \
 split -l 100000 -d - Chr$CN'N.polyploid.CDS.geosamps.vcf_';
 done
-
-
 ```
+
 #### With 8X Cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
@@ -172,4 +171,10 @@ head -5 Chr01K.polyploid.CDS.expandgeosamps.vcf_00 | tail -1 > \
 CDS.expandgeosamps.vcf.header.txt
 ```
 
+## Generate Chromosome genlight objects for Natural Samples
+### Without 8X cultivars
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
+sbatch gen_geo_genlight.sh
+```

@@ -3,6 +3,8 @@
 #module load python/3.7-anaconda-2019.07
 #source activate r_adegenet_env
 
+args = commandArgs(trailingOnly = TRUE)
+
 ### LOAD PACKAGES ###
 
 library(adegenet)
@@ -21,7 +23,7 @@ source(adeg_function_file)
 #vcf_in_0 <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
 #vcf_0 <- read.table(vcf_in_0, header = F, stringsAsFactors = F, sep = '\t')
 
-data_dir <- ags[1]
+data_dir <- args[1]
 #data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/'
 
 data_dir <- add_slash(data_dir)
@@ -61,7 +63,7 @@ out_name_short <- gsub('vcf_*', 'genlight.rds', vcf_search_string, fixed = T)
 out_name_full <- paste(data_dir, out_name_short, sep = '')
 
 ### SET VARIABLES ###
-maf_cut <- args[4]
+maf_cut <- as.numeric(args[4])
 #maf_cut <- 0.002
 
 ###########################
