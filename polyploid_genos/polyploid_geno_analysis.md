@@ -178,3 +178,11 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 sbatch gen_geo_genlight.sh
 ```
+### With 8X cultivars
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+
+sbatch gen_expandgeo_genlight.sh
+```
+
+

@@ -51,24 +51,24 @@ colnames(vcf_1) <- vcf_header
 tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
 tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
   stringsAsFactors = F)[,1])
-tet_libs <- intersect(tet_libs_0, vcf_header)
+tet_libs_1 <- intersect(tet_libs_0, vcf_header)
 
 oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
 oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
   stringsAsFactors = F)[,1])
-oct_libs <- intersect(oct_libs_0, vcf_header)
+oct_libs_1 <- intersect(oct_libs_0, vcf_header)
 
 ### SET OUTPUTS ###
 out_name_short <- gsub('vcf_*', 'genlight.rds', vcf_search_string, fixed = T)
 out_name_full <- paste(data_dir, out_name_short, sep = '')
 
 ### SET VARIABLES ###
-maf_cut <- as.numeric(args[4])
+maf_cut_in <- args[4]
 #maf_cut <- 0.002
-
+maf_cut_in <- as.numeric(maf_cut)
 ###########################
-preobj_1 <- gen_gl_preobj(vcf = vcf_1, oct_libs = oct_libs, 
-  tet_libs = tet_libs, maf_cut = maf_cut)
+preobj_1 <- gen_gl_preobj(vcf = vcf_1, oct_libs = oct_libs_1, 
+  tet_libs = tet_libs_1, maf_cut = maf_cut_in)
 
 gl_tot <- gen_gl_object(preobj_list = preobj_1)
 
