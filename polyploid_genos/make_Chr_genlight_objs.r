@@ -77,8 +77,8 @@ if(length(vcf_files) > 1){
     vcf_tmp <- read.table(vcf_files[i], header = T, stringsAsFactors = F,
       sep = '\t')
     colnames(vcf_tmp) <- vcf_header
-    preobj_tmp <- gen_gl_preobj(vcf = vcf_tmp, oct_libs = oct_libs, 
-      tet_libs = tet_libs, maf_cut = maf_cut)
+    preobj_tmp <- gen_gl_preobj(vcf = vcf_tmp, oct_libs = oct_libs_1, 
+      tet_libs = tet_libs_1, maf_cut = maf_cut_in)
     gl_tmp <- gen_gl_object(preobj_list = preobj_tmp)
     gl_tot <- cbind(gl_tot, gl_tmp)
     print(i)
