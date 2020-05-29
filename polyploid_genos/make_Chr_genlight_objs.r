@@ -65,7 +65,7 @@ out_name_full <- paste(data_dir, out_name_short, sep = '')
 ### SET VARIABLES ###
 maf_cut_in <- args[4]
 #maf_cut <- 0.002
-maf_cut_in <- as.numeric(maf_cut)
+maf_cut_in <- as.numeric(maf_cut_in)
 ###########################
 preobj_1 <- gen_gl_preobj(vcf = vcf_1, oct_libs = oct_libs_1, 
   tet_libs = tet_libs_1, maf_cut = maf_cut_in)
