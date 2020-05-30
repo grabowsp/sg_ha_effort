@@ -36,7 +36,8 @@ sbatch generate_Chr06to09_CDS_vcfs.sh
 ```
 * Moved to `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs`
 
-## Filter CDS VCF for included samples
+
+## CDS VCF for included samples - 'allsamp'
 ```
 module load python/3.7-anaconda-2019.07
 source activate gen_bioinformatics
@@ -47,9 +48,9 @@ sbatch generate_Chr01K_01N_CDS_allsamp_vcf.sh
 sbatch generate_Chr02_05_CDS_allsamp_vcf.sh
 sbatch generate_Chr06_09_CDS_allsamp_vcf.sh
 ```
-
-## Split vcfs into 100k-line files
-### Chr01K Files with different levels of missing data
+### Tests using Chr01K
+#### Split vcfs into 100k-line files
+##### Chr01K Files with different levels of missing data
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
 
@@ -77,23 +78,22 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
 head -5 Chr01K.polyploid.CDS.allsamps.vcf_00 | tail -1 > \
 CDS.allsamps.vcf.header.txt
 ```
-
-## Filter CDS VCF by missing data
+### Filter CDS VCF by missing data
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/all_samps
 
 sbatch generate_Chr01_CDS_MissFilt.sh
 ```
 
-## Generate CDS VCF for natural samples
+## Generate CDS VCF for natural/geographic samples
 * maximum 20% missing data
 * Samples sets (on Cori):
   * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo826_lib_names.txt`
   * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo_expand_839_lib_names.txt`
   * Description and code here:
     * `~/sg_ha_effort/samp_set_explanations.md`
-### Make Climate VCFs
-#### No 8X cultivars
+### Make Natural Sample VCFs
+#### No 8X cultivars - `geosamps`
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
@@ -101,7 +101,7 @@ sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
 sbatch generate_Chr02_Chr05_CDS_geosamps_vcf.sh
 sbatch generate_Chr06_Chr09_CDS_geosamps_vcf.sh
 ```
-#### Include 8X cultivars
+#### Include 8X cultivars - `expandgeosamps`
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
@@ -109,8 +109,7 @@ sbatch generate_Chr01K_01N_CDS_expandgeosamps_vcf.sh
 sbatch generate_Chr02_Chr05_CDS_expandgeosamps_vcf.sh
 sbatch generate_Chr06_Chr09_CDS_expandgeosamps_vcf.sh
 ```
-
-### Divide VCFs
+### Split Chromosome VCFs into 100K line subfiles
 #### Without 8X Cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
@@ -133,7 +132,6 @@ gunzip -kc Chr$CN'N.polyploid.CDS.geosamps.vcf.gz' | \
 split -l 100000 -d - Chr$CN'N.polyploid.CDS.geosamps.vcf_';
 done
 ```
-
 #### With 8X Cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
@@ -171,18 +169,47 @@ head -5 Chr01K.polyploid.CDS.expandgeosamps.vcf_00 | tail -1 > \
 CDS.expandgeosamps.vcf.header.txt
 ```
 
-## Generate Chromosome genlight objects for Natural Samples
-### Without 8X cultivars
+## Generate 'genlight' Objects for Natural Samples
+### Generate Chromosome genlight objects
+#### Without 8X cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 sbatch gen_geo_genlight.sh
 ```
-### With 8X cultivars
+#### With 8X cultivars
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
 sbatch gen_expandgeo_genlight.sh
 ```
 
+### Generate genome-wide, subsampled genlight object
+#### Without 8X cultivars
+* on Cori
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+* on HA
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+##### Generate object
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+
+FILE_SUB=geosamps.genlight.rds
+
+OUT_NAME=Combo.595K.polyploid.CDS.geosamps.genlight.rds
+
+PER_SUBSAMP=0.07
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
+$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
+```
+
+
+
+##### PCA results to Cori
+```
+scp grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/sub5k.polyploid.CDS.geosamps.PCAresults.rds \
+/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+```

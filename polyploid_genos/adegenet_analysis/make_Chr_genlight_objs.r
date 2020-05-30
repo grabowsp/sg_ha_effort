@@ -15,7 +15,7 @@ library(parallel)
 gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
 source(gen_function_file)
 
-adeg_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_functions.r'
+adeg_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/adegenet_functions.r'
 source(adeg_function_file)
 
 ### IMPORT DATA ###
