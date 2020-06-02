@@ -131,13 +131,3 @@ $TOT_DIST_MAT \
 euclidean
 ```
 
-## PCA on geo samples
-```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/
-
-qsub combo595K_PCA_submit.sh
-
-```
-
-
-
