@@ -75,15 +75,13 @@ ploidy_palette <- scale_colour_manual(name = 'Ploidy',
 pcX <- 1
 pcY <- 2
 
-gg_1_2_s <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')], 
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_2_s <- ggplot(pca_df, aes(x = PC1, y = PC2)) +
   geom_point(aes(color = SUBPOP)) + subpop_palette + 
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) + 
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) + 
   ggtitle(paste(plot_title_pre, ' PC', pcX, ' vs PC', pcY, sep = ''))
 
-gg_1_2_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')], 
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_2_p <- ggplot(pca_df, aes(x = PC1, y = PC2)) +
   geom_point(aes(color = totPloid)) + ploidy_palette + 
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) + 
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) + 
@@ -92,15 +90,13 @@ gg_1_2_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
 pcX <- 1
 pcY <- 3
 
-gg_1_3_s <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')], 
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_3_s <- ggplot(pca_df, aes(x = PC1, y = PC3)) +
   geom_point(aes(color = SUBPOP)) + subpop_palette + 
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) + 
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) + 
   ggtitle(paste(plot_title_pre, ' PC', pcX, ' vs PC', pcY, sep = ''))
 
-gg_1_3_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_3_p <- ggplot(pca_df, aes(x = PC1, y = PC3)) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) +
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) +
@@ -109,15 +105,13 @@ gg_1_3_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
 pcX <- 1
 pcY <- 4
 
-gg_1_4_s <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_4_s <- ggplot(pca_df, aes(x = PC1, y = PC4)) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) +
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) +
   ggtitle(paste(plot_title_pre, ' PC', pcX, ' vs PC', pcY, sep = ''))
 
-gg_1_4_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_4_p <- ggplot(pca_df, aes(x = PC1, y = PC4)) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) +
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) +
@@ -126,15 +120,13 @@ gg_1_4_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
 pcX <- 1
 pcY <- 5
 
-gg_1_5_s <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_5_s <- ggplot(pca_df, aes(x = PC1, y = PC5)) +
   geom_point(aes(color = SUBPOP)) + subpop_palette +
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) +
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) +
   ggtitle(paste(plot_title_pre, ' PC', pcX, ' vs PC', pcY, sep = ''))
 
-gg_1_5_p <- ggplot(pca_df, aes(x = pca_df[, paste('PC', pcX, sep = '')],
-    y = pca_df[ , paste('PC', pcY, sep = '')])) +
+gg_1_5_p <- ggplot(pca_df, aes(x = PC1, y = PC5)) +
   geom_point(aes(color = totPloid)) + ploidy_palette +
   xlab(paste('PC', pcX, ' (', round(per_var_vec[pcX], 2), '%)', sep = '')) +
   ylab(paste('PC', pcY, ' (', round(per_var_vec[pcY], 2), '%)', sep = '')) +
@@ -145,76 +137,5 @@ pdf(out_file, width = 12, height = 20)
   (gg_1_5_s + gg_1_5_p)
 dev.off()
 
-
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC2_subpop.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_2_s
-dev.off()
-
-gg_1_2_p <- ggplot(pca_df, aes(x = PC1, y = PC2)) +
-  geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab('PC1') + ylab('PC2') +
-  ggtitle('PC1 vs PC2 for 5k subsampled SNPs')
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC2_ploidy.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_2_p
-dev.off()
-
-gg_1_3_s <- ggplot(pca_df, aes(x = PC1, y = PC3)) +
-  geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab('PC1') + ylab('PC3') +
-  ggtitle('PC1 vs PC3 for 5k subsampled SNPs')
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC3_subpop.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_3_s
-dev.off()
-
-gg_1_3_p <- ggplot(pca_df, aes(x = PC1, y = PC3)) +
-  geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab('PC1') + ylab('PC3') +
-  ggtitle('PC1 vs PC3 for 5k subsampled SNPs')
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC3_ploidy.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_3_p
-dev.off()
-
-gg_1_4_s <- ggplot(pca_df, aes(x = PC1, y = PC4)) +
-  geom_point(aes(color = SUBPOP)) + subpop_palette +
-  xlab('PC1') + ylab('PC4') +
-  ggtitle('PC1 vs PC4 for 5k subsampled SNPs')
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC4_subpop.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_4_s
-dev.off()
-
-gg_1_4_p <- ggplot(pca_df, aes(x = PC1, y = PC4)) +
-  geom_point(aes(color = totPloid)) + ploidy_palette +
-  xlab('PC1') + ylab('PC4') +
-  ggtitle('PC1 vs PC4 for 5k subsampled SNPs')
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sub5k.polyploid.CDS.geosamps.PC1vPC4_ploidy.pdf'
-
-pdf(out_file, width = 6, height = 5)
-gg_1_4_p
-dev.off()
-
-
-
-
-
-
-
-
-
-
+quit(save = 'no')
 
