@@ -322,8 +322,14 @@ sbatch gen_lowgeo_genlight.sh
 * Goal is ~200k SNPs
   * keeps roughly the same SNP/sample ratio as with the geo samp results
 * Subsample 6% of the SNPs
+* on Cori:
+* on HA:
+
 ##### Generate Object
 ```
+module load python/3.7-anaconda-2019.07
+#source activate r_adegenet_env
+
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
 
 DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/

@@ -21,7 +21,7 @@ data_dir <- args[1]
 
 data_dir <- add_slash(data_dir)
 
-filg_sub <- args[2]
+file_sub <- args[2]
 #file_sub <- '*geosamps.genlight.rds'
 
 file_ls <- system(paste('ls ', data_dir, file_sub, sep = ''), intern = T)
