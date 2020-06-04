@@ -323,8 +323,9 @@ sbatch gen_lowgeo_genlight.sh
   * keeps roughly the same SNP/sample ratio as with the geo samp results
 * Subsample 6% of the SNPs
 * on Cori:
-* on HA:
 
+* on HA:
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/FILENAME`
 ##### Generate Object
 ```
 module load python/3.7-anaconda-2019.07
@@ -344,25 +345,5 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_ana
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 
 ```
-
-#### Without 8X cultivars
-* on Cori
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
-* on HA
-  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
-##### Generate object
-```
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
-
-DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
-
-FILE_SUB=geosamps.genlight.rds
-
-OUT_NAME=Combo.595K.polyploid.CDS.geosamps.genlight.rds
-
-PER_SUBSAMP=0.07
-
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
-$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 
 

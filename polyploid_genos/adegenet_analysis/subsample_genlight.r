@@ -33,7 +33,7 @@ tmp_gl <- readRDS(file_ls[1])
 ### SET OUTPUT ###
 out_short <- args[3]
 #out_short <- 'Combo.595K.polyploid.CDS.geosamps.genlight.rds'
-out_full <- paste(data_dir, out_sort, sep = '')
+out_full <- paste(data_dir, out_short, sep = '')
 
 ### SET VARIABLES ###
 per_subsamp <- as.numeric(args[4])
