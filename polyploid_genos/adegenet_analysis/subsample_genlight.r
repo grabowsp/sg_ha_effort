@@ -52,7 +52,7 @@ for(fn in c(2:length(file_ls))){
   print(fn)
 }
 
-saveRDS(tot_gl, out_file)
+saveRDS(tot_gl, out_full)
 
 quit(save = 'no')
 
