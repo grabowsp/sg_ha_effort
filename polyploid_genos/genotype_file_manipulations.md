@@ -183,7 +183,6 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 
 sbatch gen_expandgeo_genlight.sh
 ```
-
 ### Generate genome-wide, subsampled genlight object
 #### Without 8X cultivars
 * on Cori
@@ -206,10 +205,158 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_ana
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 ```
 
+## "Upland" and "Lowland" Samples
+* based on the 'geosamps' PCA results
+  * so these do not include the 8X cultivars
+* Cutoffs
+  * upland = PC1 < -25
+  * lowland = PC1 > 0
+### Generate library lists
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+library(adegenet)
+
+res_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.PCAresults.rds'
+
+pca_res <- readRDS(res_file)
+
+pca_mat <- pca_res$scores
+
+up_samps <- rownames(pca_mat)[which(pca_mat[,1] < -25)]
+low_samps <- rownames(pca_mat)[which(pca_mat[,1] > 0)]
+
+# 18 of 826 samples are in neither group
+
+up_out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/upland_libs_June2020.txt'
+write.table(up_samps, file = up_out_file, quote = F, sep = '\t', row.names = F, 
+  col.names = F)
+
+low_out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/lowland_libs_June2020.txt'
+write.table(low_samps, file = low_out_file, quote = F, sep = '\t', 
+  row.names = F, col.names = F)
+```
+### Generate CDS VCFs for Upland and Lowland samples
+#### Upland
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+
+sbatch generate_Chr01K_01N_CDS_upgeosamps_vcf.sh
+sbatch generate_Chr02_Chr05_CDS_upgeosamps_vcf.sh
+sbatch generate_Chr06_Chr09_CDS_upgeosamps_vcf.sh
+```
+#### Lowland
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
+
+sbatch generate_Chr01K_01N_CDS_lowgeosamps_vcf.sh
+sbatch generate_Chr02_Chr05_CDS_lowgeosamps_vcf.sh
+sbatch generate_Chr06_Chr09_CDS_lowgeosamps_vcf.sh
+```
+### Split Chromosome VCFs into 100K line subfiles
+#### Uplands
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+
+for CN in {01..09};
+do
+gunzip -kc Chr$CN'K.polyploid.CDS.upgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'K.polyploid.CDS.upgeosamps.vcf_';
+done
+
+for CN in {01..09};
+do
+gunzip -kc Chr$CN'N.polyploid.CDS.upgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'N.polyploid.CDS.upgeosamps.vcf_';
+done
+```
+#### Lowlands
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
+
+for CN in {01..09};
+do
+gunzip -kc Chr$CN'K.polyploid.CDS.lowgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'K.polyploid.CDS.lowgeosamps.vcf_';
+done
+
+for CN in {01..09};
+do
+gunzip -kc Chr$CN'N.polyploid.CDS.lowgeosamps.vcf.gz' | \
+split -l 100000 -d - Chr$CN'N.polyploid.CDS.lowgeosamps.vcf_';
+done
+```
+### Generate VCFs headers
+#### Upland
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+head -5 Chr01K.polyploid.CDS.upgeosamps.vcf_00 | tail -1 > \
+CDS.upgeosamps.vcf.header.txt
+```
+#### Lowland
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
+head -5 Chr01K.polyploid.CDS.lowgeosamps.vcf_00 | tail -1 > \
+CDS.lowgeosamps.vcf.header.txt
+```
+### Generate 'genlight' objects
+#### Chromosome genlight objects
+#### Upland
+* use 0.006 as MAF
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+
+sbatch gen_upgeo_genlight.sh
+```
+### Lowland
+* use 0.003 as MAF
+* need to make the script
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
+
+sbatch gen_lowgeo_genlight.sh
+```
+### Generate genome-wide, subsampled genlight object
+#### Upland
+* Goal is ~200k SNPs
+  * keeps roughly the same SNP/sample ratio as with the geo samp results
+* Subsample 6% of the SNPs
+##### Generate Object
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/
+
+FILE_SUB=upgeosamps.genlight.rds
+
+OUT_NAME=Combo.sub.polyploid.CDS.upgeosamps.genlight.rds
+
+PER_SUBSAMP=0.06
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
+$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
+
+```
+
+#### Without 8X cultivars
+* on Cori
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+* on HA
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+##### Generate object
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+
+FILE_SUB=geosamps.genlight.rds
+
+OUT_NAME=Combo.595K.polyploid.CDS.geosamps.genlight.rds
+
+PER_SUBSAMP=0.07
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
+$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 
 
-##### PCA results to Cori
-```
-scp grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/sub5k.polyploid.CDS.geosamps.PCAresults.rds \
-/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
-```

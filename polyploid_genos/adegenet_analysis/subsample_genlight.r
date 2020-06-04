@@ -16,13 +16,13 @@ source(gen_function_file)
 
 ### INPUT DATA ###
 
-#data_dir <- args[1]
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps'
+data_dir <- args[1]
+#data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps'
 
 data_dir <- add_slash(data_dir)
 
-#filg_sub <- args[2]
-file_sub <- '*geosamps.genlight.rds'
+filg_sub <- args[2]
+#file_sub <- '*geosamps.genlight.rds'
 
 file_ls <- system(paste('ls ', data_dir, file_sub, sep = ''), intern = T)
 
@@ -31,13 +31,13 @@ file_ls <- system(paste('ls ', data_dir, file_sub, sep = ''), intern = T)
 tmp_gl <- readRDS(file_ls[1])
 
 ### SET OUTPUT ###
-#out_short <- args[3]
-out_short <- 'Combo.595K.polyploid.CDS.geosamps.genlight.rds'
+out_short <- args[3]
+#out_short <- 'Combo.595K.polyploid.CDS.geosamps.genlight.rds'
 out_full <- paste(data_dir, out_sort, sep = '')
 
 ### SET VARIABLES ###
-#per_subsamp <- as.numeric(args[4])
-per_subsamp <- 0.07
+per_subsamp <- as.numeric(args[4])
+#per_subsamp <- 0.07
 
 keep_inds <- sort(sample(seq(nLoc(tmp_gl)), size = nLoc(tmp_gl) * per_subsamp))
 
