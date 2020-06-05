@@ -47,3 +47,66 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_ana
 * upland = PC1 < -25
 * lowland = PC1 > 0
 
+## PCA on Upland Geo samples
+### Location of genlight object
+* on Cori:
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
+* on HA:
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
+### Run PCA on HA
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/
+
+qsub combo_upgeo_PCA_submit.sh
+```
+### Location of PCA results
+* On Cori:
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/Combo.sub.polyploid.CDS.upgeosamps.genlight.PCAresults.rds`
+* On HA:
+  * '/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.upgeosamps.genlight.PCAresults.rds'
+### Generate PCA Figures
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/
+
+DATA_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/Combo.sub.polyploid.CDS.upgeosamps.genlight.PCAresults.rds
+
+PLOT_PRE=Upland_geo_samps
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/pca_figs_adegenet.r $DATA_FILE $PLOT_PRE
+
+```
+
+## PCA on Lowland Geo Samples
+### Location of genlight object
+* on Cori:
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+* on HA:
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+### Run PCA on HA
+```
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/
+
+qsub combo_lowgeo_PCA_submit.sh
+```
+### Location of PCA results
+* On Cori:
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.PCAresults.rds`
+* On HA:
+  * '/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.lowgeosamps.genlight.PCAresults.rds'
+### Generate PCA Figures
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/
+
+DATA_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.PCAresults.rds
+
+PLOT_PRE=Lowland_geo_samps
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/pca_figs_adegenet.r $DATA_FILE $PLOT_PRE
+```
+

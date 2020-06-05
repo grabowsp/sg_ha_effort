@@ -323,13 +323,13 @@ sbatch gen_lowgeo_genlight.sh
   * keeps roughly the same SNP/sample ratio as with the geo samp results
 * Subsample 6% of the SNPs
 * on Cori:
-
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
 * on HA:
-  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/FILENAME`
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
 ##### Generate Object
 ```
 module load python/3.7-anaconda-2019.07
-#source activate r_adegenet_env
+source activate r_adegenet_env
 
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
 
@@ -343,7 +343,31 @@ PER_SUBSAMP=0.06
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
+```
+#### Lowland
+* Goal is ~390000 SNPs
+* Subsample 6.4%
+* on Cori:
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+* on HA:
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+##### Generate object
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
 
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/
+
+FILE_SUB=lowgeosamps.genlight.rds
+
+OUT_NAME=Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds
+
+PER_SUBSAMP=0.064
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
+$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 ```
 
 
