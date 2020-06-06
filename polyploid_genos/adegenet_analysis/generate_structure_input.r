@@ -77,8 +77,13 @@ for(i in seq(nrow(keep_genos))){
     geno_type = geno_type)
 }
 
-struc_mat <- matrix(data = NA, nrow = sum(ploidy_vec), 
-  ncol = (ncol(struc_list[[1]])-1))
+if(geno_type == 'all_dip'){
+  struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 2), 
+    ncol = (ncol(struc_list[[1]])-1))
+}else{
+  struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4), 
+    ncol = (ncol(struc_list[[1]])-1))
+}
 
 tmp_ind <- 1
 
