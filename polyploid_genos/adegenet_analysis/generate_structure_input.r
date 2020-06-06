@@ -1,8 +1,5 @@
 # Script to generate STRUCTURE input using adegenet input
 
-# Steps
-# * 2 lines for 4X, 4 lines for 8X
-# * 1 column for each SNP
 # top row is names of SNPs
 # Col 1 = sample name
 # For now, don't worry about PopData or PopFlag which could be cols 2 and 3
@@ -40,24 +37,24 @@ source(adegenet_function_file)
 
 ### INPUT DATA ###
 
-geno_in_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds'
-#geno_in_file <- input_args[1]
+#geno_in_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds'
+geno_in_file <- input_args[1]
 
 gen_tot <- readRDS(geno_in_file)
 
 ### SET OUTPUTS ###
-#out_short <- input_args[2]
-out_short <- 'test_STRUC_genos.txt'
+out_short <- input_args[2]
+#out_short <- 'test_STRUC_genos.txt'
 
 out_file <- file.path(dirname(geno_in_file), out_short)
 
 ### SET VARIABLES ###
 
-n_snps <- 100
-#n_snps <- as.numeric(input_args[2])
+#n_snps <- 100
+n_snps <- as.numeric(input_args[3])
 
-geno_type <- 'all_tet'
-#geno_type <- input_args[3]
+#geno_type <- 'all_tet'
+geno_type <- input_args[4]
 
 ###############
 
