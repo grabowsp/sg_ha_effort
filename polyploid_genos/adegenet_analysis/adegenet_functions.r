@@ -110,52 +110,6 @@ gen_gl_object <- function(preobj_list){
   return(gl)
 }
 
-gen_struc_genos <- function(genotypes, lib_name, ploidy){
-  # NOTE: this function probably isn't good but is basis for others
-  # Function to generate genotypes formated for STRUCTURE for 8X samples
-  # INPUTS
-  # genotypes = vector of genotypes; 0 = HOM REF; 4 = HOM ALT
-  # lib_name = the name of the library/sample
-  # ploidy = "inheritance" ploidy; 4X (disomic) switchgrass have ploidy = 2; 
-  #            8x (tetrasomic) switchgrass have ploidy = 4
-  # OUTPUT
-  # data.frame with first column being the library name and each column 
-  #   representing a SNP.
-  #   2 rows for 4X switchgrass; 4 rows for 8X switchgrass
-  #   Each column contains the "1" for REF, "2" for ALT, or "-9" for NA.
-  #   If genotype is HOM REF, then entire column is "1", HOM ALT is "2", 
-  #     heterozygote calls include number of REF and ALT allels.
-  ################
-  tmp_struc <- matrix(nrow = ploidy, ncol = length(genotypes), NA)
-  tmp_na_inds <- which(is.na(genotypes))
-  tmp_struc[, tmp_na_inds] <- -9
-  #
-  hom_ref <- which(genotypes == 0)
-  A1_inds <- which(genotypes == 1)
-  A2_inds <- which(genotypes == 2)
-  A3_inds <- which(genotypes == 3)
-  A4_inds <- which(genotypes == 4)
-  #
-  tmp_struc[, hom_ref] <- 1
-  # 
-  if(ploidy == 2){
-    tmp_struc[1, A1_inds] <- 1
-    tmp_struc[2, A1_inds] <- 2
-    tmp_struc[ , A2_inds] <- 2
-  }
-  if(ploidy == 4){
-    tmp_struc[c(1:3), A1_inds] <- 1
-    tmp_struc[4, A1_inds] <- 2
-    tmp_struc[c(1:2), A2_inds] <- 1
-    tmp_struc[c(3:4), A2_inds] <- 2
-    tmp_struc[1, A3_inds] <- 1
-    tmp_struc[c(2:4), A3_inds] <- 2
-    tmp_struc[ , A4_inds] <- 2
-  }
-  struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
-  return(struc_df)
-}
-
 gen_alltet_struc <- function(genotypes, lib_name, ploidy){
   # Function to generate genotypes formated for STRUCTURE with all samples
   #  having tetrasomic genotypes (4 rows)

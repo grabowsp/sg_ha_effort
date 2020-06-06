@@ -13,26 +13,53 @@
 #module load python/3.7-anaconda-2019.07
 #source activate r_adegenet_env
 
+### LOAD PACKAGES ###
 library(adegenet)
 library(parallel)
 
+# input arguments
+input_args <- commandArgs(trailingOnly = T)
+
+# get the r-script directory to load funciton files
+rundir_args <- commandArgs(trailingOnly = F)
+
+# get system path for helper files
+file.arg.name <- '--file='
+script.name <- sub(file.arg.name, '', 
+  rundir_args[grep(file.arg.name, rundir_args)])
+script.basename <- dirname(script.name)
+gen.basename <- sub('/adegenet_analysis', '', script.basename)
+
 gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
+#gen_function_file <- file.path(gen.basename, 'general_functions.r')
 source(gen_function_file)
 
 adegenet_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/adegenet_functions.r'
+#adegenet_function_file <- file.path(script.basename, 'adegenet_functions.r')
 source(adegenet_function_file)
 
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps'
+### INPUT DATA ###
 
-data_dir <- add_slash(data_dir)
+geno_in_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds'
+#geno_in_file <- input_args[1]
 
-sub_in <- 'Combo.595K.polyploid.CDS.geosamps.genlight.rds'
+gen_tot <- readRDS(geno_in_file)
 
-in_tot <- paste(data_dir, sub_in, sep = '')
+### SET OUTPUTS ###
+#out_short <- input_args[2]
+out_short <- 'test_STRUC_genos.txt'
 
-gen_tot <- readRDS(in_tot)
+out_file <- file.path(dirname(geno_in_file), out_short)
 
-n_snps <- 10000
+### SET VARIABLES ###
+
+n_snps <- 100
+#n_snps <- as.numeric(input_args[2])
+
+geno_type <- 'all_tet'
+#geno_type <- input_args[3]
+
+###############
 
 keep_inds <- sort(sample(seq(nLoc(gen_tot)), size = n_snps))
 
@@ -46,7 +73,8 @@ struc_list <- list()
 
 for(i in seq(nrow(keep_genos))){
   struc_list[[i]] <- gen_struc_genos(genotypes = keep_genos[i, ], 
-    lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i])
+    lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i], 
+    geno_type = geno_type)
 }
 
 struc_mat <- matrix(data = NA, nrow = sum(ploidy_vec), 
@@ -65,8 +93,6 @@ lib_vec <- unlist(lapply(struc_list, function(x) x[,1]))
 
 rownames(struc_mat) <- lib_vec
 colnames(struc_mat) <- keep_snp_names
-
-out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/test_geo_STRUC_genos.txt'
 
 write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T, 
   col.names = T)
