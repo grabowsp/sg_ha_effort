@@ -111,6 +111,7 @@ gen_gl_object <- function(preobj_list){
 }
 
 gen_struc_genos <- function(genotypes, lib_name, ploidy){
+  # NOTE: this function probably isn't good but is basis for others
   # Function to generate genotypes formated for STRUCTURE for 8X samples
   # INPUTS
   # genotypes = vector of genotypes; 0 = HOM REF; 4 = HOM ALT
@@ -150,6 +151,252 @@ gen_struc_genos <- function(genotypes, lib_name, ploidy){
     tmp_struc[1, A3_inds] <- 1
     tmp_struc[c(2:4), A3_inds] <- 2
     tmp_struc[ , A4_inds] <- 2
+  }
+  struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  return(struc_df)
+}
+
+gen_alltet_struc <- function(genotypes, lib_name, ploidy){
+  # Function to generate genotypes formated for STRUCTURE with all samples
+  #  having tetrasomic genotypes (4 rows)
+  #  4X (disomic) switchgrass have their allele numbers doubled
+  # INPUTS
+  # genotypes = vector of genotypes; 0 = HOM REF; 4 = HOM ALT
+  # lib_name = the name of the library/sample
+  # ploidy = "inheritance" ploidy; 4X (disomic) switchgrass have ploidy = 2; 
+  #            8x (tetrasomic) switchgrass have ploidy = 4
+  # OUTPUT
+  # data.frame with first column being the library name and rest of columns 
+  #   representing a SNP.
+  #  Each sample gets 4 rows
+  #  Genotypes are "1" for REF, "2" for ALT, or "-9" for NA
+  #  Genotype dictates the number  of rows per sample containing "1" or "2" 
+  #  For 4X (disomic) switchgrass, RR = 4 '1's, RA = 2 '1's and 2 '2's, etc
+  ################
+  tmp_struc <- matrix(nrow = 4, ncol = length(genotypes), NA)
+  tmp_na_inds <- which(is.na(genotypes))
+  tmp_struc[, tmp_na_inds] <- -9
+  #
+  hom_ref <- which(genotypes == 0)
+  A1_inds <- which(genotypes == 1)
+  A2_inds <- which(genotypes == 2)
+  A3_inds <- which(genotypes == 3)
+  A4_inds <- which(genotypes == 4)
+  #
+  tmp_struc[, hom_ref] <- 1
+  # 
+  if(ploidy == 2){
+    tmp_struc[c(1:2), A1_inds] <- 1
+    tmp_struc[c(3:4), A1_inds] <- 2
+    tmp_struc[ , A2_inds] <- 2
+  }
+  if(ploidy == 4){
+    tmp_struc[c(1:3), A1_inds] <- 1
+    tmp_struc[4, A1_inds] <- 2
+    tmp_struc[c(1:2), A2_inds] <- 1
+    tmp_struc[c(3:4), A2_inds] <- 2
+    tmp_struc[1, A3_inds] <- 1
+    tmp_struc[c(2:4), A3_inds] <- 2
+    tmp_struc[ , A4_inds] <- 2
+  }
+    struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  return(struc_df)
+}
+
+gen_alldip_struc <- function(genotypes, lib_name, ploidy){
+  # Function to generate genotypes formated for STRUCTURE with all samples
+  #  having disomic genotypes (2 rows)
+  #  8X (tetrasomic) switchgrass have their 2 alleles randomly sampled from
+  #    the genotype
+  # INPUTS
+  # genotypes = vector of genotypes; 0 = HOM REF; 4 = HOM ALT
+  # lib_name = the name of the library/sample
+  # ploidy = "inheritance" ploidy; 4X (disomic) switchgrass have ploidy = 2; 
+  #            8x (tetrasomic) switchgrass have ploidy = 4
+  # OUTPUT
+  # data.frame with first column being the library name and rest of columns 
+  #   representing a SNP.
+  #  Each sample gets 2 rows
+  #  Genotypes are "1" for REF, "2" for ALT, or "-9" for NA
+  #  Genotype dictates the number  of rows per sample containing "1" or "2" 
+  #  For 8X (tetrasomic) switchgrass, 2 of the 4 alleles are randomly selected
+  ################
+  tmp_struc <- matrix(nrow = 2, ncol = length(genotypes), NA)
+  tmp_na_inds <- which(is.na(genotypes))
+  tmp_struc[, tmp_na_inds] <- -9
+  #
+  hom_ref <- which(genotypes == 0)
+  A1_inds <- which(genotypes == 1)
+  A2_inds <- which(genotypes == 2)
+  A3_inds <- which(genotypes == 3)
+  A4_inds <- which(genotypes == 4)
+  #
+  tmp_struc[, hom_ref] <- 1
+  # 
+  if(ploidy == 2){
+    tmp_struc[1, A1_inds] <- 1
+    tmp_struc[2, A1_inds] <- 2
+    tmp_struc[ , A2_inds] <- 2
+  }
+  if(ploidy == 4){
+    tmp_struc[ , A4_inds] <- 2
+    for(i in A1_inds){
+      tmp_sub <- sample(c(1,1,1,2), size = 2)
+      tmp_struc[, i] <- tmp_sub
+    }
+    for(j in A2_inds){
+      tmp_sub <- sample(c(1,1,2,2), size = 2)
+      tmp_struc[, j] <- tmp_sub
+    }
+    for(k in A3_inds){
+      tmp_sub <- sample(c(1,2,2,2), size = 2)
+      tmp_struc[, k] <- tmp_sub
+    }
+  }
+  struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  return(struc_df)
+}
+
+gen_partNA_struc <- function(genotypes, lib_name, ploidy){
+  # Function to generate genotypes formated for STRUCTURE with all samples
+  #  having 4 rows, but disomic genotypes have NA's in two rows
+  # INPUTS
+  # genotypes = vector of genotypes; 0 = HOM REF; 4 = HOM ALT
+  # lib_name = the name of the library/sample
+  # ploidy = "inheritance" ploidy; 4X (disomic) switchgrass have ploidy = 2; 
+  #            8x (tetrasomic) switchgrass have ploidy = 4
+  # OUTPUT
+  # data.frame with first column being the library name and rest of columns 
+  #   representing a SNP.
+  #  Each sample gets 4 rows
+  #  Genotypes are "1" for REF, "2" for ALT, or "-9" for NA
+  #  Genotype dictates the number of rows per sample containing "1" or "2" 
+  #  Rows 3 and 4 for 4X (disomic) switchgrass get NA
+  ################
+  tmp_struc <- matrix(nrow = 4, ncol = length(genotypes), NA)
+  tmp_na_inds <- which(is.na(genotypes))
+  tmp_struc[, tmp_na_inds] <- -9
+  #
+  hom_ref <- which(genotypes == 0)
+  A1_inds <- which(genotypes == 1)
+  A2_inds <- which(genotypes == 2)
+  A3_inds <- which(genotypes == 3)
+  A4_inds <- which(genotypes == 4)
+  # 
+  if(ploidy == 2){
+    tmp_struc[c(1:2), hom_ref] <- 1
+    tmp_struc[1, A1_inds] <- 1
+    tmp_struc[2, A1_inds] <- 2
+    tmp_struc[c(1:2), A2_inds] <- 2
+    tmp_struc[c(3:4), ] <- -9
+  }
+  if(ploidy == 4){
+    tmp_struc[ , hom_ref] <- 1
+    tmp_struc[c(1:3), A1_inds] <- 1
+    tmp_struc[4, A1_inds] <- 2
+    tmp_struc[c(1:2), A2_inds] <- 1
+    tmp_struc[c(3:4), A2_inds] <- 2
+    tmp_struc[1, A3_inds] <- 1
+    tmp_struc[c(2:4), A3_inds] <- 2
+    tmp_struc[ , A4_inds] <- 2
+  }
+  struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  return(struc_df)
+}
+
+gen_struc_genos <- function(genotypes, lib_name, ploidy, 
+  geno_type = 'all_tet'){
+  # Function to generate genotypes for STRUCTURE in different formats
+  #  Can generate:
+  #    1) all_tet = tetrasomic genotypes for all samples: 4 lines for all 
+  #        samples; 4X (disomic) switchgrass have genotypes replicated to 
+  #        fill the 4 lines
+  #    2) all_dip = disomic genotypes for all samples: 2 lines for all samples; 
+  #        8X (tetrasomic) switchgrass have 2 alleles randomly selected from
+  #        their genotypes
+  #    3) part_NA = 4 lines for all samples, but 4X (disomic) switchgrass have
+  #        NA in lines 3 and 4; 
+  #        I suspect this type of genotype will cause an error in STRUCTURE
+  #          but I'm not sure yet
+  # INPUTS
+  # genotypes = vector of genotypes, typically from genlight object; 
+  #   for ploidy = 2: 0 = HOM REF; 2 = HOM ALT
+  #   for ploidy = 4: 0 = HOM REF; 4 = HOM ALT
+  # lib_name = the name of the library/sample
+  # ploidy = "inheritance" ploidy; 4X (disomic) switchgrass have ploidy = 2; 
+  #            8x (tetrasomic) switchgrass have ploidy = 4 
+  # geno_type = the type of genotypes to generate for STRUCTURE.
+  #             Must be 'all_tet', 'all_dip', or 'part_NA'
+  # OUTPUT
+  # data.frame with first column being the library name and rest of columns 
+  #   representing a SNP.
+  # If geno_type = 'all_tet': sample has 4 lines, disomic samples have 2
+  #   copies of each allele
+  # If geno_type = 'all_dip': sample has 2 lines, tetrasomic samples have 2
+  #   alleles randomly sampled from the overall genotype
+  # If geno_type = 'part_NA': sample has 4 lines, if disomic, lines 3 and 4
+  #   are all NA
+  ##########
+  if(geno_type == 'all_dip'){
+    tmp_struc <- matrix(nrow = 2, ncol = length(genotypes), NA)
+  } else{
+    tmp_struc <- matrix(nrow = 4, ncol = length(genotypes), NA)
+  }
+  tmp_na_inds <- which(is.na(genotypes))
+  tmp_struc[, tmp_na_inds] <- -9
+  #
+  hom_ref <- which(genotypes == 0)
+  A1_inds <- which(genotypes == 1)
+  A2_inds <- which(genotypes == 2)
+  A3_inds <- which(genotypes == 3)
+  A4_inds <- which(genotypes == 4)
+  if(ploidy == 2){
+    if(geno_type == 'all_tet'){
+      tmp_struc[ , hom_ref] <- 1
+      tmp_struc[c(1:2), A1_inds] <- 1
+      tmp_struc[c(3:4), A1_inds] <- 2
+      tmp_struc[ , A2_inds] <- 2
+    }
+    if(geno_type == 'all_dip'){
+      tmp_struc[ , hom_ref] <- 1
+      tmp_struc[1, A1_inds] <- 1
+      tmp_struc[2, A1_inds] <- 2
+      tmp_struc[ , A2_inds] <- 2
+    }
+    if(geno_type == 'part_NA'){
+      tmp_struc[c(1:2), hom_ref] <- 1
+      tmp_struc[1, A1_inds] <- 1
+      tmp_struc[2, A1_inds] <- 2
+      tmp_struc[c(1:2), A2_inds] <- 2
+      tmp_struc[c(3:4), ] <- -9
+    }
+  }
+  if(ploidy == 4){
+    if(geno_type == 'all_dip'){
+      tmp_struc[ , hom_ref] <- 1
+      tmp_struc[ , A4_inds] <- 2
+      for(i in A1_inds){
+        tmp_sub <- sample(c(1,1,1,2), size = 2)
+        tmp_struc[, i] <- tmp_sub
+      }
+      for(j in A2_inds){
+        tmp_sub <- sample(c(1,1,2,2), size = 2)
+        tmp_struc[, j] <- tmp_sub
+      }
+      for(k in A3_inds){
+        tmp_sub <- sample(c(1,2,2,2), size = 2)
+        tmp_struc[, k] <- tmp_sub
+      }
+    } else{
+      tmp_struc[ , hom_ref] <- 1
+      tmp_struc[c(1:3), A1_inds] <- 1
+      tmp_struc[4, A1_inds] <- 2
+      tmp_struc[c(1:2), A2_inds] <- 1
+      tmp_struc[c(3:4), A2_inds] <- 2
+      tmp_struc[1, A3_inds] <- 1
+      tmp_struc[c(2:4), A3_inds] <- 2
+      tmp_struc[ , A4_inds] <- 2
+    }
   }
   struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
   return(struc_df)

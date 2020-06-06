@@ -49,6 +49,26 @@ for(i in seq(nrow(keep_genos))){
     lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i])
 }
 
+struc_mat <- matrix(data = NA, nrow = sum(ploidy_vec), 
+  ncol = (ncol(struc_list[[1]])-1))
 
+tmp_ind <- 1
+
+for(j in seq(length(struc_list))){
+  mat_inds <- c(tmp_ind:((tmp_ind-1) + nrow(struc_list[[j]])))
+  struc_mat[mat_inds, ] <- matrix(
+    data = unlist(struc_list[[j]][, -1]), nrow = nrow(struc_list[[j]]))
+  tmp_ind <- tmp_ind + nrow(struc_list[[j]])
+}
+
+lib_vec <- unlist(lapply(struc_list, function(x) x[,1]))
+
+rownames(struc_mat) <- lib_vec
+colnames(struc_mat) <- keep_snp_names
+
+out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/test_geo_STRUC_genos.txt'
+
+write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T, 
+  col.names = T)
 
 
