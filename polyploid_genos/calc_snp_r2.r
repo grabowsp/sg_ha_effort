@@ -14,8 +14,12 @@ script.name <- sub(file.arg.name, '',
 script.basename <- dirname(script.name)
 
 poly_function_file <- file.path(script.basename, 'polyploid_functions.r')
-#poly_function_file <- '/home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/polyploid_functions.r'
+#poly_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/polyploid_functions.r'
 source(poly_function_file)
+
+general_function_file <- file.path(script.basename, 'general_functions.r')
+#general_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
+source(general_function_file)
 
 ### LOAD INPUTS ###
 vcf_in <- args[1]
@@ -45,18 +49,13 @@ oct_libs_1 <- intersect(oct_libs_0, vcf_header)
 out_dir <- args[3]
 # out_dir <- 'test/'
 
-# add slash to directory if not already there
-out_dir_last_char <- rev(unlist(strsplit(out_dir, split = '')))[1]
-if(out_dir_last_char != '/'){
-  out_dir <- paste(out_dir, '/', sep = '')
-}
+out_dir <- add_slash(out_dir)
 
 out_suffix <- '_r2.rds'
 
 file_pre <- gsub('.vcf', '', rev(unlist(strsplit(vcf_in, split = '/')))[1])
 
 out_file <- paste(out_dir, file_pre, out_suffix, sep = '')
-
 
 ### SET VARIABLES ###
 # first column with sample genotypes
