@@ -1,6 +1,6 @@
 # Functions used for analysis of polyploid genomes
 
-generate_dosage_df <- dataframe(vcf, oct_libs = c(), tet_libs = c(), R1 = T){
+generate_dosage_df <- function(vcf, oct_libs = c(), tet_libs = c(), R1 = T){
   # Function for generating vcf of allele dosages ranging from 0 to 2
   #  based on 0-4 allele genotypes
   # INPUTS
