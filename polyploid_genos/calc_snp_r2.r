@@ -5,7 +5,7 @@
 
 args = commandArgs(trailingOnly = TRUE)
 
-rundir_args <- commandArgs(trailingOnly = T)
+rundir_args <- commandArgs(trailingOnly = F)
 
 ### LOAD PACKAGES ###
 file.arg.name <- '--file='
