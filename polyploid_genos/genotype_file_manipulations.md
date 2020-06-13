@@ -370,4 +370,53 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_ana
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 ```
 
+## Generate CDS VCFs for Upland subgroups for looking at r^2
+### Generate Files
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/up_subgroups
 
+sbatch generate_Chr01K_01N_CDS_up_subgroups_vcf.sh
+
+#sbatch generate_Chr01K_01N_CDS_upgeosamps_vcf.sh
+#sbatch generate_Chr02_Chr05_CDS_upgeosamps_vcf.sh
+#sbatch generate_Chr06_Chr09_CDS_upgeosamps_vcf.sh
+```
+### Split Chromosome VCFs into 100K line subfiles
+#### Start with Chr01K
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/up_subgroups
+
+# group tet_1
+gunzip -kc Chr01K.polyploid.CDS.up_tet_1.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.up_tet_1.vcf_
+
+gunzip -kc Chr01K.polyploid.CDS.up_tet_2.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.up_tet_2.vcf_
+
+gunzip -kc Chr01K.polyploid.CDS.up_oct_1.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.up_oct_1.vcf_
+
+gunzip -kc Chr01K.polyploid.CDS.up_oct_2.vcf.gz | \
+split -l 100000 -d - Chr01K.polyploid.CDS.up_oct_2.vcf_
+```
+### Make header files
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/up_subgroups
+
+head -5 Chr01K.polyploid.CDS.up_oct_1.vcf_00 | tail -1 > \
+CDS.up_oct_1.vcf.header.txt
+
+head -5 Chr01K.polyploid.CDS.up_oct_2.vcf_00 | tail -1 > \
+CDS.up_oct_2.vcf.header.txt
+
+head -5 Chr01K.polyploid.CDS.up_tet_1.vcf_00 | tail -1 > \
+CDS.up_tet_1.vcf.header.txt
+
+head -5 Chr01K.polyploid.CDS.up_tet_2.vcf_00 | tail -1 > \
+CDS.up_tet_2.vcf.header.txt
+
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
+head -5 Chr01K.polyploid.CDS.upgeosamps.vcf_00 | tail -1 > \
+CDS.upgeosamps.vcf.header.txt
+```

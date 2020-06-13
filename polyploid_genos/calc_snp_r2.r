@@ -5,7 +5,17 @@
 
 args = commandArgs(trailingOnly = TRUE)
 
+input_args <- commandArgs(trailingOnly = T)
+
 ### LOAD PACKAGES ###
+file.arg.name <- '--file='
+script.name <- sub(file.arg.name, '',
+  rundir_args[grep(file.arg.name, rundir_args)])
+script.basename <- dirname(script.name)
+
+poly_function_file <- file.path(script.basename, 'polyploid_functions.r')
+#poly_function_file <- '/home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/polyploid_functions.r'
+source(poly_function_file)
 
 ### LOAD INPUTS ###
 vcf_in <- args[1]
@@ -20,6 +30,16 @@ vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
   sep = '\t', header = F, comment.char = '@'))
 
 colnames(vcf) <- vcf_header
+
+tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
+tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
+  stringsAsFactors = F)[,1])
+tet_libs_1 <- intersect(tet_libs_0, vcf_header)
+
+oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
+oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
+  stringsAsFactors = F)[,1])
+oct_libs_1 <- intersect(oct_libs_0, vcf_header)
 
 ### SET OUTPUTS ###
 out_dir <- args[3]
@@ -88,27 +108,31 @@ calc_snp_r2 <- function(vcf_df, max_dist, pos_column = 'POS',
 
 #################
 
-vcf[vcf == './.'] <- NA
+#vcf[vcf == './.'] <- NA
 
-geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
-oct_dosage_vec <- c('2', '1.5', '1', '0.5', '0')
+#geno_vec <- c('4/0', '3/1', '2/2', '1/3', '0/4')
+#oct_dosage_vec <- c('2', '1.5', '1', '0.5', '0')
 #tet_dosage_vec <- c('2', '1', '1', '1', '0')
 
-for(i in seq(length(geno_vec))){
-  vcf[vcf == geno_vec[i]] <- oct_dosage_vec[i]
-}
+#for(i in seq(length(geno_vec))){
+#  vcf[vcf == geno_vec[i]] <- oct_dosage_vec[i]
+#}
 
-for(i in c(FIRST_SAMP:ncol(vcf))){
-  vcf[, i] <- as.numeric(vcf[, i])
-}
+#for(i in c(FIRST_SAMP:ncol(vcf))){
+#  vcf[, i] <- as.numeric(vcf[, i])
+#}
+
+dosage_vcf <- cbind(vcf[ , c(1:(FIRST_SAMP-1))], 
+  generate_dosage_df(vcf = vcf, oct_libs = oct_libs_1, tet_libs = tet_libs_1, 
+  R1 = T))
 
 # Filter VCF based on maf
-n_nas <- apply( vcf[, c(FIRST_SAMP:ncol(vcf))], 1,
+n_nas <- apply( dosage_vcf[, c(FIRST_SAMP:ncol(dosage_vcf))], 1,
   function(x) sum(is.na(unlist(x))))
 
-n_gsamps <- length(c(FIRST_SAMP:ncol(vcf))) - n_nas
+n_gsamps <- length(c(FIRST_SAMP:ncol(dosage_vcf))) - n_nas
 
-sum_ref <- apply( vcf[ , c(FIRST_SAMP:ncol(vcf))], 1,
+sum_ref <- apply( dosage_vcf[ , c(FIRST_SAMP:ncol(dosage_vcf))], 1,
   function(x) sum(unlist(x), na.rm = T))
 
 allele_freq <- sum_ref / (2*n_gsamps)
@@ -117,11 +141,11 @@ allele_freq_1 <- 1-allele_freq
 minor_af <- apply(cbind(allele_freq, allele_freq_1), 1, function(x) min(x)[1])
 
 if(sum(minor_af < maf_cut) > 0){
-  vcf_1 <- vcf[-which(minor_af < maf_cut), ]
-}else{vcf_1 <- vcf}
+  vcf_1 <- dosage_vcf[-which(minor_af < maf_cut), ]
+}else{vcf_1 <- dosage_vcf}
 
 # Filter out any non-variant SNPs, if they exist
-n_genos <- apply(vcf_1[ , c(FIRST_SAMP:ncol(vcf_1))], 1, 
+n_genos <- apply(vcf_1[, c(FIRST_SAMP:ncol(vcf_1))], 1, 
   function(x) length(table(unlist(x))))
 
 if(sum(n_genos==1) > 0) {
