@@ -109,10 +109,9 @@ ln -s geosamps_20k_alltet.strucgenos.txt geo_20k_alltet.txt
 ### Run K=1 to K=8
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_samps
-qsub geo_structure_k1.1.sh
 
 bash
-for KT in {2..8};
+for KT in {1..8};
   do
   qsub geo_structure_k$KT'.1.sh';
   done;
