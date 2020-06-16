@@ -190,4 +190,128 @@ PLOT_PRE=Lowland_geo_samps
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/pca_figs_adegenet.r $DATA_FILE $PLOT_PRE
 ```
+### Split samples into preliminary groups for testing r^2
+* Note: these are NOT necessarily true groupings, they are just groups that
+    are similar samples
+low_tx_1 <- PC1 < -40, PC2 < -15
+low_tx_2 <- PC1 < -40, PC2 > -15, PC2 < 5 
+low_gc_1 <- PC2 > 35
+low_ec_1 <- PC1 > 20, PC3 < -22
+low_ec_2 <- PC1 > 20, PC3 > -3, PC3 < 6
+* Some additional notes:
+  * there are several lines with "NA" in meta$STATE that were used here
+    * ex: the NAM lines from Noble, Timber, etc
+  * These are synthetic/breeding lines and I don't think should be used in
+climate or "natural" population analyses
+  * I think the issue came because I used "LIB_CLIMATE" but I should
+have used "LIB_BIOCLIM"
+
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+library(adegenet)
+
+pca_res_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.PCAresults.rds'
+
+low_pca_tot <- readRDS(pca_res_file)
+
+low_pca <- low_pca_tot$scores
+
+low_tx_1 <- intersect(which(low_pca[,1] < -40), which(low_pca[,2] < -15))
+low_tx_2 <- intersect(which(low_pca[,1] < -40), 
+  intersect(which(low_pca[,2] > -15), which(low_pca[,2] < 5)))
+
+low_gc_1 <- which(low_pca[,2] > 35)
+
+low_ec_1 <- intersect(which(low_pca[,1] > 20), which(low_pca[,3] < -22))
+low_ec_2 <- intersect(which(low_pca[,1] > 20), 
+  intersect(which(low_pca[,3] > -3), which(low_pca[,3] < 6)))
+
+sum(duplicated(c(low_tx_1, low_tx_2, low_gc_1, low_ec_1, low_ec_2)))
+#0
+
+ploidy_info_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'ploidy_calling/sg_ploidy_results_v3.0.txt', sep = '')
+ploidy_info <- read.table(ploidy_info_file, header = T, sep = '\t',
+  stringsAsFactors = F)
+
+meta_file <- '/global/homes/g/grabowsp/data/switchgrass/reseq_metadata/Reseq_Metadata_Sept_2019_Edited_for_R.tsv'
+
+meta <- read.table(meta_file, sep = '\t', header = T, stringsAsFactors = F,
+  quote = "", comment.char = '$')
+
+geno_meta_file <- '/global/homes/g/grabowsp/data/switchgrass/reseq_metadata/genotype.metadata.May2020.rds'
+
+geno_meta <- readRDS(geno_meta_file)
+
+low_tx_1_meta_inds <- c()
+for(i in low_tx_1){
+  tmp_ind <- which(meta$LIBRARY == rownames(low_pca)[i])
+  low_tx_1_meta_inds <- c(low_tx_1_meta_inds, tmp_ind)
+}
+# 43 
+table(meta$STATE[low_tx_1_meta_inds]), rest are 6 AK, 3 KS, 7 OK, 5 TX, 1 CO
+# these are 1/2 NAM samples from NOBLE
+low_tx_1_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_tx_1_libs.txt', sep = '')
+write.table(meta$LIBRARY[low_tx_1_meta_inds], file = low_tx_1_out_file,
+  quote = F, sep = '\t', row.names = F, col.names = F)
+
+low_tx_2_meta_inds <- c()
+for(i in low_tx_2){
+  tmp_ind <- which(meta$LIBRARY == rownames(low_pca)[i])
+  low_tx_2_meta_inds <- c(low_tx_2_meta_inds, tmp_ind)
+}
+# 73
+table(meta$STATE[low_tx_2_meta_inds])
+sum(is.na(meta$STATE[low_tx_2_meta_inds]))
+# mainly TX and MX
+low_tx_2_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_tx_2_libs.txt', sep = '')
+write.table(meta$LIBRARY[low_tx_2_meta_inds], file = low_tx_2_out_file,
+  quote = F, sep = '\t', row.names = F, col.names = F)
+
+low_gc_1_meta_inds <- c()
+for(i in low_gc_1){
+  tmp_ind <- which(meta$LIBRARY == rownames(low_pca)[i])
+  low_gc_1_meta_inds <- c(low_gc_1_meta_inds, tmp_ind)
+}
+#33
+table(meta$STATE[low_gc_1_meta_inds])
+# 16 MS, 8 LA, 8 LF, 1 AK
+low_gc_1_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_gc_1_libs.txt', sep = '')
+write.table(meta$LIBRARY[low_gc_1_meta_inds], file = low_gc_1_out_file,
+  quote = F, sep = '\t', row.names = F, col.names = F)
+
+low_ec_1_meta_inds <- c()
+for(i in low_ec_1){
+  tmp_ind <- which(meta$LIBRARY == rownames(low_pca)[i])
+  low_ec_1_meta_inds <- c(low_ec_1_meta_inds, tmp_ind)
+}
+#46
+table(meta$STATE[low_ec_1_meta_inds])
+# 14 RI, 15 NY, 7 CT, 3 ME, 3 MA, 3 NH
+low_ec_1_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_ec_1_libs.txt', sep = '')
+write.table(meta$LIBRARY[low_ec_1_meta_inds], file = low_ec_1_out_file,
+  quote = F, sep = '\t', row.names = F, col.names = F)
+
+low_ec_2_meta_inds <- c()
+for(i in low_ec_2){
+  tmp_ind <- which(meta$LIBRARY == rownames(low_pca)[i])
+  low_ec_2_meta_inds <- c(low_ec_2_meta_inds, tmp_ind)
+}
+#52
+table(meta$STATE[low_ec_2_meta_inds])
+# 26 NY, 15 NJ, 6 DE, 2 ML, 1 NC, 2 VI
+low_ec_2_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
+  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_ec_2_libs.txt', sep = '')
+write.table(meta$LIBRARY[low_ec_2_meta_inds], file = low_ec_2_out_file,
+  quote = F, sep = '\t', row.names = F, col.names = F)
+
+
+```
+
 

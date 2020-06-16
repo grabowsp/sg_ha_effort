@@ -18,6 +18,34 @@ add_slash <- function(dir_string){
   return(final_string)
 }
 
+gen_unified_df <- function(df_list){
+  # Generate a combined data.frame from a list of data.frames with the
+  #   same formats
+  #  Example: df_list has 4 elements, each with a data.frame with same
+  #    colnames generated for a different sample or comparison; this
+  #    generates a combined data.frame with the same number of columns,
+  #    but column 1 from all elements are concatenated together, same for
+  #    column 2, etc.
+  # INPUTS
+  # df_list = list where each element is a data.frame and all the data.frames
+  #            have the same number of columns and same column names
+  # OUTPUT
+  # data.frame with same number of columns and same column names as the 
+  #  data.frames in the elements of df_list; column contains the
+  #  concatenated vector of all the column 1's from each element, continuing
+  #  for all the columns
+  ###########################
+  n_cols <- ncol(df_list[[1]])
+  df_colnames <- colnames(df_list[[1]])
+  tot_list <- list()
+  for(i in seq(n_cols)){
+    tot_list[[i]] <- unlist(lapply(df_list, function(x) x[,i]))
+  }
+  tot_df <- data.frame(tot_list, stringsAsFactors = F)
+  colnames(tot_df) <- colnames(df_list[[1]])
+  return(tot_df)
+}
+
 generate_dist_window_df <- function(dist_vec, value_vec, window_size, 
   avg_type = mean){
   # Get average of all values in value vec in each window interval

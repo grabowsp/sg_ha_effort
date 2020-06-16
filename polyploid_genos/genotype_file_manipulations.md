@@ -88,12 +88,19 @@ sbatch generate_Chr01_CDS_MissFilt.sh
 ## Generate CDS VCF for natural/geographic samples
 * maximum 20% missing data
 * Samples sets (on Cori):
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo826_lib_names.txt`
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo_expand_839_lib_names.txt`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo_v2_772_lib_names.txt`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/geo_v2_expand_785_lib_names.txt`
   * Description and code here:
     * `~/sg_ha_effort/samp_set_explanations.md`
 ### Make Natural Sample VCFs
 #### No 8X cultivars - `geosamps`
+* remove old files
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+rm *vcf.gz
+rm *vcf_*
+```
+* generate correct files
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
@@ -102,6 +109,13 @@ sbatch generate_Chr02_Chr05_CDS_geosamps_vcf.sh
 sbatch generate_Chr06_Chr09_CDS_geosamps_vcf.sh
 ```
 #### Include 8X cultivars - `expandgeosamps`
+* remove old files
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+rm *vcf.gz
+rm *vcf_*
+```
+* generate correct files
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
@@ -168,7 +182,6 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 head -5 Chr01K.polyploid.CDS.expandgeosamps.vcf_00 | tail -1 > \
 CDS.expandgeosamps.vcf.header.txt
 ```
-
 ## Generate 'genlight' Objects for Natural Samples
 ### Generate Chromosome genlight objects
 #### Without 8X cultivars
@@ -183,6 +196,7 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 
 sbatch gen_expandgeo_genlight.sh
 ```
+### CONTINUE MAKING NEW FILES HERE
 ### Generate genome-wide, subsampled genlight object
 #### Without 8X cultivars
 * on Cori
