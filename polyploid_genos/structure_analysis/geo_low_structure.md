@@ -4,35 +4,8 @@
 * all samples with 4 lines
 * all samples with 2 lines
 * all samples with 4 lines but 4X (disomic) SG have NA (-9) in lines 3 and 4
-### Generate test genotypes
-```
-module load python/3.7-anaconda-2019.07
-source activate r_adegenet_env
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
-
-IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds
-
-OUT_NAME=test_100_alltet.strucgenos.txt
-N_SNPS=100
-GENO_TYPE=all_tet
-
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
-$IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
-
-OUT_NAME=test_100_alldip.strucgenos.txt
-GENO_TYPE=all_dip
-
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
-$IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
-
-OUT_NAME=test_100_partNA.strucgenos.txt
-GENO_TYPE=part_NA
-
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
-$IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
-```
-### Make Generic param files
+## Make Generic param files
 * Directory
   * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/structure_tests`
 #### mainparam files
@@ -42,46 +15,27 @@ $IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
   * `dip_generic.mainparams`
 #### extraparams
 * `generic.extraparams`
-### Run tests
-```
-module load python/3.7-anaconda-2019.07
-source activate structure_env
-
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/structure_tests
-
-structure -m tet_generic.mainparams -e generic.extraparams -K 3 -L 100 \
--N 826 -i alltet_test -o at_test_2
-
-structure -m tet_generic.mainparams -e generic.extraparams -K 3 -L 100 \
--N 826 -i partNA_test -o pNA_test_1
-
-structure -m dip_generic.mainparams -e generic.extraparams -K 3 -L 100 \
--N 826 -i alldip_test -o ap_test_1
-```
 
 ## Full run for geo_samps
 * 20k SNPs, 10k burnin, 30k run
+  * 482 samples
 ### Generate Genotypes
 ```
 module load python/3.7-anaconda-2019.07
 source activate r_adegenet_env
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
 
-#IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds
+IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/combo.sub.polyploid.CDS.lowgeosamps.genlight.rds
 
-IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/combo.sub.polyploid.CDS.geosamps.genlight.rds
-
-#OUT_NAME=geosamps_20k_alltet.strucgenos.txt
-OUT_NAME=geosamps_v2_20k_alltet.strucgenos.txt
+OUT_NAME=lowgeo_20k_alltet.strucgenos.txt
 N_SNPS=20000
 GENO_TYPE=all_tet
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
 $IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
 
-#OUT_NAME=geosamps_20k_alldip.strucgenos.txt
-OUT_NAME=geosamps_v2_20k_alldip.strucgenos.txt
+OUT_NAME=lowgeo_20k_alldip.strucgenos.txt
 GENO_TYPE=all_dip
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
@@ -89,64 +43,59 @@ $IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
 ```
 #### Move genotypes to new directory
 ```
-#cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/geo_20k_struc_files
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/geo_v2_struc_files
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/low_geo_struc_files
 
-mv ../geosamps_v2_20k*strucgenos.txt .
-cp ../structure_tests/*params .
+mv ../lowgeo_20k*strucgenos.txt .
+cp ../../geo_samps/structure_tests/*params .
 
-tar -czvf geosamp_v2_files.tar.gz *params *strucgenos.txt
+tar -czvf lowgeo_struc_files.tar.gz *params *strucgenos.txt
 ```
 ### Transfer to HA
 ```
-#cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/geo_20k_struc_files
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/low_geo_struc_files
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/geo_v2_struc_files
-
-scp geosamp_v2_files.tar.gz grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2/
+scp lowgeo_struc_files.tar.gz grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/low_geo/
 
 # on HA
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
-tar -xzvf geosamp_v2_files.tar.gz
-
-#ln -s geosamps_20k_alldip.strucgenos.txt geo_20k_alldip.txt
-#ln -s geosamps_20k_alltet.strucgenos.txt geo_20k_alltet.txt
-
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/low_geo
+tar -xzvf lowgeo_struc_files.tar.gz
 ```
-### Run K=1 to K=8
+### Run K=1 to K=10
 #### Generate submission scripts
 ```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_samps
-#cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
 
 bash
 for SUB_FILE in *sh;
   do
-  sed 's/struc\/geo_samps/struc\/geo_v2/g; s/geosamps_20k/geosamps_v2_20k/g; s/OUT_NAME=geo20k_/OUT_NAME=geo_v2_/g; s/N_SAMPS=826/N_SAMPS=772/g' \
-  $SUB_FILE > ../geo_v2/$SUB_FILE;
+  FILE_SUF=`echo $SUB_FILE | awk -F'[_]' '{print $3}'`
+  sed 's/struc\/geo_v2/struc\/low_geo/g; s/geosamps_v2_20k/lowgeo_20k/g; s/OUT_NAME=geo_v2_/OUT_NAME=lowgeo_/g; s/N_SAMPS=772/N_SAMPS=482/g' \
+  $SUB_FILE > ../low_geo/lowgeo_structure_$FILE_SUF;
   done
 ```
+
+
+
+### CONTINUE FROM HERE
 #### Submit jobs
 ```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/low_geo
 
 bash
 for KT in {1..10};
-  do
-  qsub geo_structure_k$KT'.1.sh';
-  done;
-
-bash
-for KT in {1..10};
-  do
-  qsub geo_structure_k$KT'.2.sh';
-  done;
-
-for KT in {1..10};
-  do
-  qsub geo_structure_k$KT'.3.sh';
+  for KR in {1..3};
+    do
+    qsub lowgeo_structure_k$KT'.'$KR'.sh';
   done;
 ```
+
+
+
+
+
+
+
+
 ### CONTINUE RE-RUN FROM HERE
 ### Get Estimated Ln Prob of Data
 ```

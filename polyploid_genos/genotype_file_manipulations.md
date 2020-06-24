@@ -104,8 +104,9 @@ rm *vcf_*
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
-sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
-sbatch generate_Chr02_Chr05_CDS_geosamps_vcf.sh
+#sbatch generate_Chr01K_01N_CDS_geosamps_vcf.sh
+#sbatch generate_Chr02_Chr05_CDS_geosamps_vcf.sh
+sbatch generate_Chr01_Chr05_CDS_geosamps_vcf.sh
 sbatch generate_Chr06_Chr09_CDS_geosamps_vcf.sh
 ```
 #### Include 8X cultivars - `expandgeosamps`
@@ -196,22 +197,30 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_sa
 
 sbatch gen_expandgeo_genlight.sh
 ```
-### CONTINUE MAKING NEW FILES HERE
 ### Generate genome-wide, subsampled genlight object
 #### Without 8X cultivars
 * on Cori
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/combo.sub.polyploid.CDS.geosamps.genlight.rds`
+    * 772 samples
+    * 592,150 SNPs
+  * Old:
+    * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
 * on HA
-  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
+  * Old:
+    * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.595K.polyploid.CDS.geosamps.genlight.rds`
 ##### Generate object
 ```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 
 DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
 
-FILE_SUB=geosamps.genlight.rds
+FILE_SUB=Chr*geosamps.genlight.rds
 
-OUT_NAME=Combo.595K.polyploid.CDS.geosamps.genlight.rds
+#OUT_NAME=Combo.595K.polyploid.CDS.geosamps.genlight.rds
+OUT_NAME=combo.sub.polyploid.CDS.geosamps.genlight.rds
 
 PER_SUBSAMP=0.07
 
@@ -223,8 +232,8 @@ $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 * based on the 'geosamps' PCA results
   * so these do not include the 8X cultivars
 * Cutoffs
-  * upland = PC1 < -25
-  * lowland = PC1 > 0
+  * upland = PC1 > 20
+  * lowland = PC1 < 0
 ### Generate library lists
 ```
 module load python/3.7-anaconda-2019.07
@@ -232,16 +241,18 @@ source activate r_adegenet_env
 
 library(adegenet)
 
-res_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Combo.595K.polyploid.CDS.geosamps.genlight.PCAresults.rds'
+res_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/combo.sub.polyploid.CDS.geosamps.genlight.PCAresults.rds'
 
 pca_res <- readRDS(res_file)
 
 pca_mat <- pca_res$scores
 
-up_samps <- rownames(pca_mat)[which(pca_mat[,1] < -25)]
-low_samps <- rownames(pca_mat)[which(pca_mat[,1] > 0)]
+up_samps <- rownames(pca_mat)[which(pca_mat[,1] > 20)]
+# 277
+low_samps <- rownames(pca_mat)[which(pca_mat[,1] < 0)]
+# 482
 
-# 18 of 826 samples are in neither group
+# 13 of 772 samples are in neither group
 
 up_out_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/upland_libs_June2020.txt'
 write.table(up_samps, file = up_out_file, quote = F, sep = '\t', row.names = F, 
@@ -316,15 +327,16 @@ CDS.lowgeosamps.vcf.header.txt
 ```
 ### Generate 'genlight' objects
 #### Chromosome genlight objects
+* goal for MAF is to have at least 4 copies of the allele in the population
 #### Upland
-* use 0.006 as MAF
+* use 0.008 as MAF
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps
 
 sbatch gen_upgeo_genlight.sh
 ```
 ### Lowland
-* use 0.003 as MAF
+* use 0.005 as MAF
 * need to make the script
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps
@@ -333,13 +345,25 @@ sbatch gen_lowgeo_genlight.sh
 ```
 ### Generate genome-wide, subsampled genlight object
 #### Upland
-* Goal is ~200k SNPs
+* Goal is ~175k SNPs
   * keeps roughly the same SNP/sample ratio as with the geo samp results
-* Subsample 6% of the SNPs
+  * To get this:
+    * get the SNP/sample number from the geo_samps subsampled genlight object
+    * multiply the SNP/sample number by the number of upland samples
+* Subsample 5.7% of the SNPs
+  * to get this: 
+    * estimate total SNPs in vcf's by counting up number of sub_vcfs
+    * for 1 chromosome, estimate the % of SNPs that made it from the sub_vcfs 
+to the genlight.rds
+    * divide goal amount of SNPs by (total SNPs in sub_vcfs * % that made it 
+into the genlight objects)
 * on Cori:
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_samps/combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
+  * 189,499 SNPs
+  * 277 samples
 * on HA:
-  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
+  * Old:
+    * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.upgeosamps.genlight.rds`
 ##### Generate Object
 ```
 module load python/3.7-anaconda-2019.07
@@ -351,20 +375,24 @@ DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/up_geo_
 
 FILE_SUB=upgeosamps.genlight.rds
 
-OUT_NAME=Combo.sub.polyploid.CDS.upgeosamps.genlight.rds
+#OUT_NAME=Combo.sub.polyploid.CDS.upgeosamps.genlight.rds
+OUT_NAME=combo.sub.polyploid.CDS.upgeosamps.genlight.rds
 
-PER_SUBSAMP=0.06
+PER_SUBSAMP=0.057
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 ```
 #### Lowland
-* Goal is ~390000 SNPs
-* Subsample 6.4%
+* Goal is ~370000 SNPs
+* Subsample 7.1%
 * on Cori:
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+  * 482 genotypes; 385,251 SNPs
+  * OLD
+    * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo_samps/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
 * on HA:
-  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/genlight_objs/combo.sub.polyploid.CDS.lowgeosamps.genlight.rds`
 ##### Generate object
 ```
 module load python/3.7-anaconda-2019.07
@@ -376,9 +404,10 @@ DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/low_geo
 
 FILE_SUB=lowgeosamps.genlight.rds
 
-OUT_NAME=Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds
+#OUT_NAME=Combo.sub.polyploid.CDS.lowgeosamps.genlight.rds
+OUT_NAME=combo.sub.polyploid.CDS.lowgeosamps.genlight.rds
 
-PER_SUBSAMP=0.064
+PER_SUBSAMP=0.071
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP

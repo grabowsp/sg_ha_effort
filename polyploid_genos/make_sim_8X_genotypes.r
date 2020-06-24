@@ -1,10 +1,27 @@
 #module load python/3.7-anaconda-2019.07
 #source activate R_analysis
 
-vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
+args = commandArgs(trailingOnly = TRUE)
+
+rundir_args <- commandArgs(trailingOnly = F)
+
+### LOAD PACKAGES ###
+file.arg.name <- '--file='
+script.name <- sub(file.arg.name, '',
+  rundir_args[grep(file.arg.name, rundir_args)])
+script.basename <- dirname(script.name)
+
+polyploid_function_file <- file.path(script.basename, 'polyploid_functions.r')
+#polyploid_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/polyploid_functions.r'
+source(polyploid_function_file)
+
+### LOAD INPUTS ###
+vcf_in <- args[1]
+#vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
 vcf_1 <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
 
-vcf_header_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt'
+vcf_header_file <- args[2]
+#vcf_header_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt'
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
   sep = '\t', header = F, comment.char = '@'))
 
@@ -20,97 +37,48 @@ oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
   stringsAsFactors = F)[,1])
 oct_libs_1 <- intersect(oct_libs_0, vcf_header)
 
-up_tet_1_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/up_geo_samps/', 'up_tet_1_libs.txt', sep = '')
-up_tet_1 <- read.table(up_tet_1_in, header = F, stringsAsFactors = F)[,1]
-up_tet_2_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/up_geo_samps/', 'up_tet_2_libs.txt', sep = '')
-up_tet_2 <- read.table(up_tet_2_in, header = F, stringsAsFactors = F)[,1]
-low_tx_1_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_tx_1_libs.txt', sep = '')
-low_tx_1 <- read.table(low_tx_1_in, header = F, stringsAsFactors = F)[,1]
-low_tx_2_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_tx_2_libs.txt', sep = '')
-low_tx_2 <- read.table(low_tx_2_in, header = F, stringsAsFactors = F)[,1]
-low_gc_1_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_gc_1_libs.txt', sep = '')
-low_gc_1 <- read.table(low_gc_1_in, header = F, stringsAsFactors = F)[,1]
-low_ec_1_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_ec_1_libs.txt', sep = '')
-low_ec_1 <- read.table(low_ec_1_in, header = F, stringsAsFactors = F)[,1]
-low_ec_2_in <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
-  'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_ec_2_libs.txt', sep = '')
-low_ec_2 <- read.table(low_ec_2_in, header = F, stringsAsFactors = F)[,1]
+sim_combo_libs_file <- args[3]
+#sim_combo_libs_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim_8X_library_combinations.txt'
 
-# need to make list of sample combinations to use for all subfiles
+sim_combo_libs <- read.table(sim_combo_libs_file, header = T, sep = '\t',
+  stringsAsFactors = F)
 
-keep_list <- list(up_tet_1, up_tet_2, low_tx_1, low_tx_2, low_gc_1, low_ec_1,
-  low_ec_2)
+### SET OUTPUT ###
+out_file <- gsub('vcf', 'sim8X_AltDosage_vcf', vcf_in)
 
-keep_pops <- c('up_tet_1', 'up_tet_2', 'low_tx_1', 'low_tx_2', 'low_gc_1',
-  'low_ec_1', 'low_ec_2')
+### SET VARIABLES ###
 
-keep_samps <- unlist(keep_list)
 
-min_popsize <- min(unlist(lapply(keep_list, length)))
-#33
+##################
+# I won't have to do this filtering once I'm done remaking the files and groups
+tot_keep_libs_0 <- unique(c(sim_combo_libs$keep_1, sim_combo_libs$keep_2))
 
-sim_popsize <- min_popsize - 1
+miss_libs <- setdiff(tot_keep_libs_0, colnames(vcf_1))
 
-gen_samepop_sim_combo_libs <- function(lib_vec, n_combos, sim_popname){
-  keep_1 <- c()
-  keep_2 <- c()
-  option_2 <- lib_vec
-  for(i in sample(lib_vec, size = n_combos)){
-    not_avail <- c()
-    if(i %in% keep_2){
-      tmp_ind <- which(keep_2 == i)
-      not_avail <- keep_1[tmp_ind]
-    }
-    keep_1 <- c(keep_1, i)
-    tmp_keep_2 <- sample(setdiff(option_2, c(i, not_avail)), size = 1)
-    keep_2 <- c(keep_2, tmp_keep_2)
-    option_2 <- setdiff(option_2, tmp_keep_2)
-  }
-  sim_sampnames <- paste(sim_popname, seq(n_combos), sep = '_')
-  keep_df <- data.frame(keep_1, keep_2, sim_pop = sim_popname, 
-    sim_samp_name = sim_sampnames, stringsAsFactors = F)
+tot_keep_libs <- intersect(tot_keep_libs_0, colnames(vcf_1))
+
+scl_rm_inds <- unique(c(which(sim_combo_libs$keep_1 %in% miss_libs), 
+  which(sim_combo_libs$keep_2 %in% miss_libs)))
+
+sim_combo_libs_1 <- sim_combo_libs[-scl_rm_inds,]
+
+pre_4X_dosage_df <- generate_dosage_df(vcf_1, oct_libs = c(), 
+  tet_libs = tot_keep_libs, R1 = F)
+
+sim_dosage_mat <- matrix(NA, ncol = nrow(sim_combo_libs_1), 
+  nrow = nrow(pre_4X_dosage_df))
+for(i in seq(nrow(sim_combo_libs_1))){
+  tmp_samp_1 <- sim_combo_libs_1$keep_1[i]
+  tmp_samp_2 <- sim_combo_libs_1$keep_2[i]
+  sim_dosage_mat[,i] <- apply(pre_4X_dosage_df[, c(tmp_samp_1, tmp_samp_2)], 
+    1, sum)
 }
 
-samepop_8X_list <- list()
-for(j in seq(length(keep_list))){
-  samepop_8X_list[[j]] <- gen_samepop_sim_combo_libs(lib_vec = keep_list[[j]], 
-    n_combos = sim_popsize, sim_popname = paste(keep_pops[j], '_8X', sep = ''))
-}
+colnames(sim_dosage_mat) <- sim_combo_libs_1$sim_samp_name
 
-gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
-source(gen_function_file)
+sim_vcf <- data.frame(vcf_1[,c(1:9)], sim_dosage_mat, stringsAsFactors = F)
 
-gen_unified_df <- function(df_list){
-  n_cols <- ncol(df_list[[1]])
-  df_colnames <- colnames(df_list[[1]])
-  tot_list <- list()
-  for(i in seq(n_cols)){
-    tot_list[[i]] <- unlist(lapply(df_list, function(x) x[,i]))
-  }
-  tot_df <- data.frame(tot_list, stringsAsFactors = F)
-  colnames(tot_df) <- colnames(df_list[[1]])
-  return(tot_df) 
-}
+write.table(sim_vcf, file = out_file, quote = F, sep = '\t', row.names = F,
+  col.names = T)
 
-samepop_8X_tot_df <- gen_unified_df(df_list = samepop_8X_list)
-# NEXT: combinations between populations
-
-combopop_8X_list <- list()
-comp_vec <- c(2:length(keep_list))
-
-
-
-
-# Generate 4X dosage genotypes
-# Select samples within and between groups to combine into 8X genotypes
-# (dosage+dosage) / 2
-# don't include SNPs with NA
-# Save as rds object with informative names
-
-
+quit(save = 'no')

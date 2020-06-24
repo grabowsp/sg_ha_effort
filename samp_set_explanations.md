@@ -114,3 +114,18 @@ write.table(tet_libs, file = tet_lib_file, quote = F, row.names = F,
 write.table(oct_libs, file = oct_lib_file, quote = F, row.names = F,
   col.names = F)
 ```
+
+## Sample combinations for making simulated 8X genotypes
+* Selected pairwise library combinations within- and between 4X populations 
+  for combining into simulated 8X genotypes
+* No library combinations are repeated in any of the population combinations
+* For within-population combinations, each library is included in at most
+  2 combinations
+* Script used for generating combinations
+  * `~/sg_ha_effort/polyploid_genos/make_sim_8X_combos.r`
+* Location of table with library combinations (on Cori)
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim_8X_library_combinations.txt`
+
+```
+
+```
