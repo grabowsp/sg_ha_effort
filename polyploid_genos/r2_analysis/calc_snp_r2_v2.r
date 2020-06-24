@@ -154,9 +154,11 @@ for(i in unique_pop_vec){
   tmp_inds <- which(samp_pop_df[,2] == i)
   tmp_samps <- samp_pop_df[tmp_inds,1]
   if(vcf_type == 'allele_count'){
+    tmp_oct_libs <- intersect(oct_libs_1, tmp_samps)
+    tmp_tet_libs <- intersect(tet_libs_1, tmp_samps)
     dosage_vcf <- cbind(vcf[ , c(1:(FIRST_SAMP-1))],
-      generate_dosage_df(vcf = vcf[, tmp_samps], oct_libs = oct_libs_1, 
-      tet_libs = tet_libs_1, R1 = F))
+      generate_dosage_df(vcf = vcf[, tmp_samps], oct_libs = tmp_oct_libs, 
+      tet_libs = tmp_tet_libs, R1 = F))
   } else{
     dosage_vcf <- cbind(vcf[ , c(1:(FIRST_SAMP-1))], vcf[, tmp_samps])
   }

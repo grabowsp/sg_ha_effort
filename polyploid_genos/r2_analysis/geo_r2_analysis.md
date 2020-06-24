@@ -22,6 +22,8 @@
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
+
 VCF_IN=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00
 
 HEADER_IN=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt
@@ -38,7 +40,8 @@ MAX_DIST=10000
 
 MAF=0.1
 
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/r2_analysis/calc_snp_r2_v2.r
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/r2_analysis/calc_snp_r2_v2.r $VCF_IN $HEADER_IN $SAMP_POP_FILE $VCF_TYPE $OUT_DIR \
+$FILE_PRE $MAX_DIST $MAF
 
 ```
 
