@@ -51,7 +51,7 @@ if(samp_pop_in != 'all'){
 # whether the vcf needs to be converted from number of tetrasomic alleles to
 #  dosage ranging from 0 to 2
 vcf_type <- args[4]
-vcf_type <- 'allele_count' # or 'dosage'
+#vcf_type <- 'allele_count' # or 'dosage'
 
 tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
 tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
