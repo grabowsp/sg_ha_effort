@@ -62,6 +62,9 @@ for(i in seq(length(subset_list))){
 }
 
 tot_df <- data.frame(LIB = lib_vec, POP = pop_vec, stringsAsFactors = F)
+# need to remove IEYM because is an 8X in a 4X population
+tot_df <- tot_df[-which(tot_df$LIB == 'IEYM'), ]
+
 write.table(tot_df, tot_df_out, quote = F, sep = '\t', row.names = F, 
   col.names = T)
 

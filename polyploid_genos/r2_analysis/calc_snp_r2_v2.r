@@ -151,6 +151,7 @@ unique_pop_vec <- unique(samp_pop_df[,2])
 r2_list <- list()
 
 for(i in unique_pop_vec){
+  print(i)
   tmp_inds <- which(samp_pop_df[,2] == i)
   tmp_samps <- samp_pop_df[tmp_inds,1]
   if(vcf_type == 'allele_count'){
@@ -174,6 +175,7 @@ for(i in unique_pop_vec){
   #
   minor_af <- apply(cbind(allele_freq, allele_freq_1), 1, 
     function(x) min(x)[1])
+  minor_af[which(is.na(minor_af))] <- 0
   #
   if(sum(minor_af < maf_cut) > 0){
     vcf_1 <- dosage_vcf[-which(minor_af < maf_cut), ]
