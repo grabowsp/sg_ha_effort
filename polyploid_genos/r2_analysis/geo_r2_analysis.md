@@ -135,6 +135,7 @@ combo_r2_out_file <- paste(data_dir, 'combined.geo_subgroup.r2.rds', sep = '')
 saveRDS(combo_r2, file = combo_r2_out_file)
 ```
 ######
+```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
@@ -148,6 +149,8 @@ source(general_function_file)
 r2_res <- readRDS(chr_r2_file)
 chr_vec <- names(r2_res)
 
+test <- r2_res[1:2]
+
 r2_windows <- lapply(r2_res, function(y) 
   lapply(y, function(x) 
     generate_dist_window_df(dist_vec = x$comp_dist, value_vec = x$r2, 
@@ -160,7 +163,13 @@ perHighr2_windows <- lapply(r2_res, function(y)
       window_size = 10, max_val = 0.9)
 ))
 
+```
+### Generate r^ window value for windows
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
 
+
+```
 
 
 
