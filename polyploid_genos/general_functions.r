@@ -76,3 +76,42 @@ generate_dist_window_df <- function(dist_vec, value_vec, window_size,
   return(tot_df)
 }
 
+generate_perHighVal_window_df <- function(dist_vec, value_vec, window_size,
+  max_val){
+  # Get the percentage of values in value vec above max_val in each window;
+  #  Written to generate the % of r2 values above a high r2 in windows, but
+  #   can be used for any tuype of pairwise comparisons across SNPs
+  # INPUTS
+  # dist_vec = vector of distances between SNPs used for comparison
+  # value_vec = values (ex: r^2); must have same length to and correspond with
+  #              dist_vec
+  # window_size = bp size of the window
+  # max_val = the maximum value above which a value is considered "High"
+  # OUTPUT
+  # data.frame with max distance in a window, the percentage of "High Values"
+  #  in the window, the number of comparisons in the window, and the number
+  #  of NA's
+  ###############
+  max_dist <- max(dist_vec)
+  dist_mult_vec <- seq(ceiling(max_dist/window_size))
+  wind_dists <- lapply(dist_mult_vec, function(x)
+    ((x-1)*window_size) + c(1:window_size))
+  window_inds <- lapply(wind_dists, function(x)
+    which(dist_vec %in% x))
+  num_window_inds <- unlist(lapply(window_inds, length))
+  n_na_inds <- unlist(lapply(window_inds, function(x)
+    sum(is.na(value_vec[x]))))
+  n_high_ld_inds <- unlist(lapply(window_inds, function(x)
+    sum(value_vec[x] >= max_val, na.rm = T)))
+  per_high_ld <- n_high_ld_inds/(num_window_inds-n_na_inds)
+  tot_df <- data.frame(window_pos = dist_mult_vec * window_size,
+    per_high_ld = per_high_ld, n_comps = num_window_inds, n_nas = n_na_inds,
+    stringsAsFactors = F)
+  return(tot_df)
+}
+
+
+
+
+
+

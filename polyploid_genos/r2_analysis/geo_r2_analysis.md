@@ -17,7 +17,7 @@
   * 6 subpopulations
 
 ## Run r^2 analysis
-### Test
+### Test for 1 sub-vcf
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
@@ -44,9 +44,9 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/r2_analysis/
 $FILE_PRE $MAX_DIST $MAF
 
 ```
-# Run on all subfiles
+### Run interactively on all subfiles
+* was taking too long so stopped after finishing Chr03K and Chr03N
 ```
-
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
@@ -80,23 +80,117 @@ for VCF_IN in `ls $LS_STRING`;
   $VCF_IN $HEADER_IN $SAMP_POP_FILE $VCF_TYPE $OUT_DIR $FILE_PRE \
   $MAX_DIST $MAF;
   done;
-
 ```
+### Submit jobs on chromosomes
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
 
-## Errors
+sbatch calc_r2_Chr04_Chr06.sh
+sbatch calc_r2_Chr07_Chr09.sh
+```
+### Consolidate Results
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
 
-Error in if (sum(minor_af < maf_cut) > 0) { : 
-  missing value where TRUE/FALSE needed
-In addition: There were 50 or more warnings (use warnings() to see the first 50)
-Execution halted
+chr_vec <- paste(rep('Chr0', times = 18), rep(seq(9), each = 2), 
+  rep(c('K', 'N'), times = 9), sep = '')
+
+data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/'
+
+# add_slash
+
+tot_r2_ls <- list()
+
+for(CHR_NAME in chr_vec){
+  print(CHR_NAME)
+  ls_com <- paste('ls ', data_dir, CHR_NAME, '*geo_subgroup_r2.rds', sep = '')
+  res_files <- system(ls_com, intern = T)
+  tot_chr_r2 <- readRDS(res_files[1])
+  if(length(res_files > 1)){
+    for(RF in c(2:length(res_files))){
+      tmp_r2 <- readRDS(res_files[RF])
+      for(i in seq(length(tot_chr_r2))){
+        tot_chr_r2[[i]] <- rbind(tot_chr_r2[[i]], tmp_r2[[i]])
+      }
+    }
+  }
+  tot_r2_ls[[CHR_NAME]] <- tot_chr_r2
+}
+
+tot_r2_out_file <- paste(data_dir, 'Chromosome.geo_subgroup.r2.rds', sep = '')
+
+saveRDS(tot_r2_ls, file = tot_r2_out_file)
+
+combo_r2 <- tot_r2_ls[[1]]
+
+for(j in c(2:length(tot_r2_ls))){
+  print(j)
+  for(k in seq(length(combo_r2))){
+    combo_r2[[k]] <- rbind(combo_r2[[k]], tot_r2_ls[[j]][[k]])
+  }
+}
+
+combo_r2_out_file <- paste(data_dir, 'combined.geo_subgroup.r2.rds', sep = '')
+saveRDS(combo_r2, file = combo_r2_out_file)
+```
+######
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+chr_r2_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/Chromosome.geo_subgroup.r2.rds'
+
+general_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
+source(general_function_file)
 
 
-Files:
-* /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_03
-* /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01N.polyploid.CDS.geosamps.vcf_07
-* /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr02K.polyploid.CDS.geosamps.vcf_01
-* /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr02N.polyploid.CDS.geosamps.vcf_01
-* /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr03K.polyploid.CDS.geosamps.vcf_04
+
+r2_res <- readRDS(chr_r2_file)
+chr_vec <- names(r2_res)
+
+r2_windows <- lapply(r2_res, function(y) 
+  lapply(y, function(x) 
+    generate_dist_window_df(dist_vec = x$comp_dist, value_vec = x$r2, 
+      window_size = 10)
+  ))
+
+perHighr2_windows <- lapply(r2_res, function(y)
+  lapply(y, function(x)
+    generate_perHighVal_window_df(dist_vec = x$comp_dist, value_vec = x$r2,
+      window_size = 10, max_val = 0.9)
+))
 
 
+
+
+
+
+# NEED to ADD the HIGH_VALUE/LD function to the General Funciton File, then
+# run that
+
+test <- lapply(tot_r2_ls[[1]], function(x) generate_dist_window_df(dist_vec = x$comp_dist, value_vec = x$r2, window_size = 10))
+
+
+
+
+file_short <- 'Chr07N.polyploid.CDS.geosamps.vcf_06_geo_subgroup_r2.rds'
+
+in_file <- paste(data_dir, file_short, sep = '')
+
+r2_data <- readRDS(in_file)
+
+tot_r2 <- r2_data
+
+file_short_2 <- 'Chr07N.polyploid.CDS.geosamps.vcf_07_geo_subgroup_r2.rds'
+
+in_file_2 <- paste(data_dir, file_short_2, sep = '')
+
+r2_data <- readRDS(in_file_2)
+
+for(i in seq(length(tot_r2))){
+  tot_r2[[i]] <- rbind(tot_r2[[i]], r2_data[[i]])
+}
+
+
+``` 
 

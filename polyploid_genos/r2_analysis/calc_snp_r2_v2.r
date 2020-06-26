@@ -151,7 +151,7 @@ unique_pop_vec <- unique(samp_pop_df[,2])
 r2_list <- list()
 
 for(i in unique_pop_vec){
-  print(i)
+  #print(i)
   tmp_inds <- which(samp_pop_df[,2] == i)
   tmp_samps <- samp_pop_df[tmp_inds,1]
   if(vcf_type == 'allele_count'){
