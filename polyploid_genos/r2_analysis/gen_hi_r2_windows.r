@@ -42,7 +42,7 @@ hi_r2 <- as.numeric(args[4])
 ### SET OUTPUTS ###
 out_file_pre <- sub('r2.rds', '', r2_data_in, fixed = T)
 
-mean_r2window_out <- paste(out_file_pre, 'mean_r2.', window_size, 
+hi_r2window_out <- paste(out_file_pre, 'hi_r2.', window_size, 
   'bpwindow.rds', sep = '')
 
 ########
@@ -69,7 +69,7 @@ if(data_type == 'chromosomes'){
   )
 }
 
-saveRDS(perHighr2_windows, file = mean_r2window_out)
+saveRDS(perHighr2_windows, file = hi_r2window_out)
 
 quit(save = 'no')
 

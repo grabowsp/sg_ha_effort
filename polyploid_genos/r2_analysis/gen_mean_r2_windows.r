@@ -3,9 +3,6 @@
 # module load python/3.7-anaconda-2019.07
 # source activate R_analysis
 
-# module load python/3.7-anaconda-2019.07
-# source activate R_analysis
-
 args = commandArgs(trailingOnly = TRUE)
 
 rundir_args <- commandArgs(trailingOnly = F)
@@ -31,6 +28,8 @@ r2_data_in <- args[1]
 
 data_type <- args[2]
 #data_type <- 'chromosomes' # or 'combo'
+# indicates if input file has r^2 values separated by 
+#  chromosomes ['chromosomes'] or combined across the genome ['combo']
 
 ### SET VARIABLES ###
 window_size <- as.numeric(args[3])

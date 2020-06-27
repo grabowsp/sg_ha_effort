@@ -60,7 +60,7 @@ scp upgeo_struc_files.tar.gz grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/d
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/up_geo
 tar -xzvf upgeo_struc_files.tar.gz
 ```
-### Run K=1 to K=8
+### Run K=1 to K=10
 #### Generate submission scripts
 ```
 bash
@@ -73,30 +73,22 @@ for SUB_FILE in *sh;
   $SUB_FILE > ../up_geo/upgeo_structure_$FILE_SUF;
   done
 ```
-
-
-
-### CONTINUE FROM HERE
 #### Submit jobs
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/up_geo
 
 bash
 for KT in {1..10};
+  do
   for KR in {1..3};
     do
     qsub upgeo_structure_k$KT'.'$KR'.sh';
   done;
+done
 ```
 
 
-
-
-
-
-
-
-### CONTINUE RE-RUN FROM HERE
+### CONTINUE  FROM HERE
 ### Get Estimated Ln Prob of Data
 ```
 #cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_samps

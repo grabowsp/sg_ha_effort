@@ -125,7 +125,12 @@ for SUB_FILE in *sh;
   sed 's/struc\/geo_samps/struc\/geo_v2/g; s/geosamps_20k/geosamps_v2_20k/g; s/OUT_NAME=geo20k_/OUT_NAME=geo_v2_/g; s/N_SAMPS=826/N_SAMPS=772/g' \
   $SUB_FILE > ../geo_v2/$SUB_FILE;
   done
-```
+n {1..10};
+  do
+  for KR in {1..3};
+    do
+    qsub upgeo_structure_k$KT'.'$KR'.sh';
+  done; ``
 #### Submit jobs
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2

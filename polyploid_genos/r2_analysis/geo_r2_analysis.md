@@ -16,8 +16,21 @@
   * 271 Libraries
   * 6 subpopulations
 
-## Run r^2 analysis
-### Test for 1 sub-vcf
+## Calculate Pairwise r^2 in CDS SNPs across genome
+* Important Notes
+  * max distance between SNPs = 10kbp
+  * min MAF = 0.1
+  * r^2 calculated separately within each of the 10 subgroups
+* R script for generating sub-vcf objects
+  * `~/calc_snp_r2_v2.r`
+* Cori directory with results
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results`
+  * There is a separate .rds file for each sub-vcf
+* consolidated r^2 results separated by chromosomes
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/Chromosome.geo_subgroup.r2.rds`
+* consolidated r^2 results combined across all chromosomes
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/combined.geo_subgroup.r2.rds` 
+### Test script for 1 sub-vcf
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
@@ -44,44 +57,9 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/r2_analysis/
 $FILE_PRE $MAX_DIST $MAF
 
 ```
-### Run interactively on all subfiles
-* was taking too long so stopped after finishing Chr03K and Chr03N
-```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
-
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
-
-# Variables for bash loop
-
-DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
-
-LS_STRING=$DATA_DIR*vcf_*
-
-# Variables for R script
-
-HEADER_IN=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt
-
-SAMP_POP_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/subpop_libs_for_r2.txt
-
-VCF_TYPE=allele_count
-
-OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
-
-MAX_DIST=10000
-
-MAF=0.1
-
-for VCF_IN in `ls $LS_STRING`;
-  do
-  echo $VCF_IN;
-  FILE_PRE=`basename $VCF_IN`'_geo_subgroup';
-  Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/r2_analysis/calc_snp_r2_v2.r \
-  $VCF_IN $HEADER_IN $SAMP_POP_FILE $VCF_TYPE $OUT_DIR $FILE_PRE \
-  $MAX_DIST $MAF;
-  done;
-```
-### Submit jobs on chromosomes
+### Submit jobs for remaining sub-vcfs by chromosomes
+* I tried using an interactive session to loop through the script for all
+the sub-vcf results but was taking too long so stopped after Chr03K and Chr03N
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
 
@@ -89,117 +67,47 @@ sbatch calc_r2_Chr04_Chr06.sh
 sbatch calc_r2_Chr07_Chr09.sh
 ```
 ### Consolidate Results
+* Rscript for consolidating results from sub-vcf results
+  * `~/consolidate_r2_results.r`
+#### Can run interactively but takes a long time; next time I'd submit the job
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
-chr_vec <- paste(rep('Chr0', times = 18), rep(seq(9), each = 2), 
-  rep(c('K', 'N'), times = 9), sep = '')
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
 
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/'
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/
 
-# add_slash
+FILE_SUF=geo_subgroup
 
-tot_r2_ls <- list()
-
-for(CHR_NAME in chr_vec){
-  print(CHR_NAME)
-  ls_com <- paste('ls ', data_dir, CHR_NAME, '*geo_subgroup_r2.rds', sep = '')
-  res_files <- system(ls_com, intern = T)
-  tot_chr_r2 <- readRDS(res_files[1])
-  if(length(res_files > 1)){
-    for(RF in c(2:length(res_files))){
-      tmp_r2 <- readRDS(res_files[RF])
-      for(i in seq(length(tot_chr_r2))){
-        tot_chr_r2[[i]] <- rbind(tot_chr_r2[[i]], tmp_r2[[i]])
-      }
-    }
-  }
-  tot_r2_ls[[CHR_NAME]] <- tot_chr_r2
-}
-
-tot_r2_out_file <- paste(data_dir, 'Chromosome.geo_subgroup.r2.rds', sep = '')
-
-saveRDS(tot_r2_ls, file = tot_r2_out_file)
-
-combo_r2 <- tot_r2_ls[[1]]
-
-for(j in c(2:length(tot_r2_ls))){
-  print(j)
-  for(k in seq(length(combo_r2))){
-    combo_r2[[k]] <- rbind(combo_r2[[k]], tot_r2_ls[[j]][[k]])
-  }
-}
-
-combo_r2_out_file <- paste(data_dir, 'combined.geo_subgroup.r2.rds', sep = '')
-saveRDS(combo_r2, file = combo_r2_out_file)
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/\
+r2_analysis/consolidate_r2_results.r \
+$DATA_DIR $FILE_SUF
 ```
-######
-```
-module load python/3.7-anaconda-2019.07
-source activate R_analysis
 
-chr_r2_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results/Chromosome.geo_subgroup.r2.rds'
+## Generate r^ window value for windows
 
-general_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
-source(general_function_file)
-
-
-
-r2_res <- readRDS(chr_r2_file)
-chr_vec <- names(r2_res)
-
-test <- r2_res[1:2]
-
-r2_windows <- lapply(r2_res, function(y) 
-  lapply(y, function(x) 
-    generate_dist_window_df(dist_vec = x$comp_dist, value_vec = x$r2, 
-      window_size = 10)
-  ))
-
-perHighr2_windows <- lapply(r2_res, function(y)
-  lapply(y, function(x)
-    generate_perHighVal_window_df(dist_vec = x$comp_dist, value_vec = x$r2,
-      window_size = 10, max_val = 0.9)
-))
-
-```
-### Generate r^ window value for windows
+* Important Notes:
+  * window size are 10bp, so 1-10bp, 11-20bp, etc distance between SNPs used
+for pairwise comparison
+  * For Hi-LD results, used r^2 > 0.9 as cutoff for high LD
+  * generated window-based results for each of the 10 subgroups
+* R script used for generating mean r^2 window results
+  * `~/gen_mean_r2_windows.r`
+* R script used for generating percentage of values in window with high r^2
+  * `~/gen_hi_r2_windows.r`
+### Submit jobs for generating window-based results
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/r2_results
 
+sbatch gen_chrom_mean_r2_windows.sh 
+sbatch gen_chrom_hi_r2_windows.sh
+
+sbatch gen_combo_mean_r2_windows.sh
+sbatch gen_combo_hi_r2_windows.sh
 
 ```
 
 
 
-
-# NEED to ADD the HIGH_VALUE/LD function to the General Funciton File, then
-# run that
-
-test <- lapply(tot_r2_ls[[1]], function(x) generate_dist_window_df(dist_vec = x$comp_dist, value_vec = x$r2, window_size = 10))
-
-
-
-
-file_short <- 'Chr07N.polyploid.CDS.geosamps.vcf_06_geo_subgroup_r2.rds'
-
-in_file <- paste(data_dir, file_short, sep = '')
-
-r2_data <- readRDS(in_file)
-
-tot_r2 <- r2_data
-
-file_short_2 <- 'Chr07N.polyploid.CDS.geosamps.vcf_07_geo_subgroup_r2.rds'
-
-in_file_2 <- paste(data_dir, file_short_2, sep = '')
-
-r2_data <- readRDS(in_file_2)
-
-for(i in seq(length(tot_r2))){
-  tot_r2[[i]] <- rbind(tot_r2[[i]], r2_data[[i]])
-}
-
-
-``` 
 
