@@ -49,7 +49,6 @@ sim_combo_libs <- read.table(sim_combo_libs_file, header = T, sep = '\t',
 
 ### SET OUTPUT ###
 out_dir <- args[4]
-print('out_dir YES')
 #out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs'
 out_dir <- add_slash(out_dir)
 
