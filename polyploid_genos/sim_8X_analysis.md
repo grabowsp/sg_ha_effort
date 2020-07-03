@@ -67,7 +67,7 @@ OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samp
 
 OUT_PRE=geo_samp
 
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/make_sim_8X_genotypes.r $VCF_IN $VCF_HEAD $SIM_COMBO $OUT_DIR $OUT_PRE
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/make_sim_8X_genotypes.r $VCF_IN $VCF_HEAD $SIM_COMBO_IN $OUT_DIR $OUT_PRE
 
 
 ```

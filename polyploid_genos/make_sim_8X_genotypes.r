@@ -11,8 +11,6 @@ script.name <- sub(file.arg.name, '',
   rundir_args[grep(file.arg.name, rundir_args)])
 script.basename <- dirname(script.name)
 
-print('loaded arguments')
-
 polyploid_function_file <- file.path(script.basename, 'polyploid_functions.r')
 #polyploid_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/polyploid_functions.r'
 source(polyploid_function_file)
@@ -20,8 +18,6 @@ source(polyploid_function_file)
 gen_function_file <- file.path(script.basename, 'general_functions.r')
 #gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
 source(gen_function_file)
-
-print('loaded packages')
 
 ### LOAD INPUTS ###
 vcf_in <- args[1]
@@ -50,7 +46,6 @@ sim_combo_libs_file <- args[3]
 
 sim_combo_libs <- read.table(sim_combo_libs_file, header = T, sep = '\t',
   stringsAsFactors = F)
-print('sim_combo_libs YES')
 
 ### SET OUTPUT ###
 out_dir <- args[4]
@@ -58,27 +53,15 @@ print('out_dir YES')
 #out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs'
 out_dir <- add_slash(out_dir)
 
-print(out_dir)
-
 out_pre <- args[5]
 #out_pre <- 'geo_samp'
 out_pre_long <- paste(out_pre, '_sim8X_AltDosage.vcf', sep = '')
 
-print(out_pre_long)
-
 in_pre <- basename(vcf_in)
-
-print(in_pre)
 
 out_short <- gsub('vcf', out_pre_long, in_pre)
 
-print(out_short)
-
 out_file <- paste(out_dir, out_short, sep = '')
-
-print(out_file)
-
-quit(save = 'no')
 
 ### SET VARIABLES ###
 
