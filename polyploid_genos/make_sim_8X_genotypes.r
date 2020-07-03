@@ -52,15 +52,27 @@ out_dir <- args[4]
 #out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs'
 out_dir <- add_slash(out_dir)
 
+print(out_dir)
+
 out_pre <- args[5]
 #out_pre <- 'geo_samp'
 out_pre_long <- paste(out_pre, '_sim8X_AltDosage.vcf', sep = '')
 
+print(out_pre_long)
+
 in_pre <- basename(vcf_in)
+
+print(in_pre)
 
 out_short <- gsub('vcf', out_pre_long, in_pre)
 
+print(out_short)
+
 out_file <- paste(out_dir, out_short, sep = '')
+
+print(out_file)
+
+quit(save = 'no')
 
 ### SET VARIABLES ###
 
