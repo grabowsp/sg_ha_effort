@@ -15,6 +15,10 @@ polyploid_function_file <- file.path(script.basename, 'polyploid_functions.r')
 #polyploid_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/polyploid_functions.r'
 source(polyploid_function_file)
 
+gen_function_file <- file.path(script.basename, 'general_functions.r')
+#gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
+source(gen_function_file)
+
 ### LOAD INPUTS ###
 vcf_in <- args[1]
 #vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
@@ -38,43 +42,54 @@ oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
 oct_libs_1 <- intersect(oct_libs_0, vcf_header)
 
 sim_combo_libs_file <- args[3]
-#sim_combo_libs_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim_8X_library_combinations.txt'
+#sim_combo_libs_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/geo_samp_sim8X_lib_combos.txt'
 
 sim_combo_libs <- read.table(sim_combo_libs_file, header = T, sep = '\t',
   stringsAsFactors = F)
 
 ### SET OUTPUT ###
-out_file <- gsub('vcf', 'sim8X_AltDosage_vcf', vcf_in)
+out_dir <- args[4]
+#out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs'
+out_dir <- add_slash(out_dir)
+
+out_pre <- args[5]
+#out_pre <- 'geo_samp'
+out_pre_long <- paste(out_pre, '_sim8X_AltDosage.vcf', sep = '')
+
+in_pre <- basename(vcf_in)
+
+out_short <- gsub('vcf', out_pre_long, in_pre)
+
+out_file <- paste(out_dir, out_short, sep = '')
 
 ### SET VARIABLES ###
 
-
 ##################
-# I won't have to do this filtering once I'm done remaking the files and groups
-tot_keep_libs_0 <- unique(c(sim_combo_libs$keep_1, sim_combo_libs$keep_2))
+tot_keep_libs <- unique(c(sim_combo_libs$keep_1, sim_combo_libs$keep_2))
 
-miss_libs <- setdiff(tot_keep_libs_0, colnames(vcf_1))
-
-tot_keep_libs <- intersect(tot_keep_libs_0, colnames(vcf_1))
-
-scl_rm_inds <- unique(c(which(sim_combo_libs$keep_1 %in% miss_libs), 
-  which(sim_combo_libs$keep_2 %in% miss_libs)))
-
-sim_combo_libs_1 <- sim_combo_libs[-scl_rm_inds,]
+#####
+# These are old step that may need to use if the samples don't completely
+#  overlap between the vcf and the chosen sample, for some reason
+#miss_libs <- setdiff(tot_keep_libs_0, colnames(vcf_1))
+#tot_keep_libs <- intersect(tot_keep_libs_0, colnames(vcf_1))
+#scl_rm_inds <- unique(c(which(sim_combo_libs$keep_1 %in% miss_libs), 
+#  which(sim_combo_libs$keep_2 %in% miss_libs)))
+#sim_combo_libs_1 <- sim_combo_libs[-scl_rm_inds,]
+######
 
 pre_4X_dosage_df <- generate_dosage_df(vcf_1, oct_libs = c(), 
   tet_libs = tot_keep_libs, R1 = F)
 
-sim_dosage_mat <- matrix(NA, ncol = nrow(sim_combo_libs_1), 
+sim_dosage_mat <- matrix(NA, ncol = nrow(sim_combo_libs), 
   nrow = nrow(pre_4X_dosage_df))
-for(i in seq(nrow(sim_combo_libs_1))){
-  tmp_samp_1 <- sim_combo_libs_1$keep_1[i]
-  tmp_samp_2 <- sim_combo_libs_1$keep_2[i]
+for(i in seq(nrow(sim_combo_libs))){
+  tmp_samp_1 <- sim_combo_libs$keep_1[i]
+  tmp_samp_2 <- sim_combo_libs$keep_2[i]
   sim_dosage_mat[,i] <- apply(pre_4X_dosage_df[, c(tmp_samp_1, tmp_samp_2)], 
     1, sum)
 }
 
-colnames(sim_dosage_mat) <- sim_combo_libs_1$sim_samp_name
+colnames(sim_dosage_mat) <- sim_combo_libs$sim_samp_name
 
 sim_vcf <- data.frame(vcf_1[,c(1:9)], sim_dosage_mat, stringsAsFactors = F)
 
@@ -82,3 +97,4 @@ write.table(sim_vcf, file = out_file, quote = F, sep = '\t', row.names = F,
   col.names = T)
 
 quit(save = 'no')
+
