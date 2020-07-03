@@ -53,7 +53,7 @@ sub_pop_lib_df <- read.table(sub_pop_file, sep = '\t', header = T,
 
 out_dir <- dirname(sub_pop_file)
 
-combo_out_pre <- args[?]
+combo_out_pre <- args[2]
 #combo_out_pre <- 'geo_samp'
 out_short <- paste(combo_out_pre, '_sim8X_lib_combos.txt')
 

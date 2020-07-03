@@ -16,11 +16,13 @@
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+
 SUBPOP_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/4X_subpop_libs_for_r2.txt
 
 OUT_PRE=geo_samp
 
-
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/make_sim_8X_combos.r $SUBPOP_FILE $OUT_PRE
 
 
 ```
