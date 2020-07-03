@@ -55,7 +55,7 @@ out_dir <- dirname(sub_pop_file)
 
 combo_out_pre <- args[2]
 #combo_out_pre <- 'geo_samp'
-out_short <- paste(combo_out_pre, '_sim8X_lib_combos.txt')
+out_short <- paste(combo_out_pre, '_sim8X_lib_combos.txt', sep = '')
 
 combo_out_file <- file.path(out_dir, out_short)
 
