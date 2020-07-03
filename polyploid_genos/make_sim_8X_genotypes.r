@@ -11,6 +11,8 @@ script.name <- sub(file.arg.name, '',
   rundir_args[grep(file.arg.name, rundir_args)])
 script.basename <- dirname(script.name)
 
+print('loaded arguments')
+
 polyploid_function_file <- file.path(script.basename, 'polyploid_functions.r')
 #polyploid_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/polyploid_functions.r'
 source(polyploid_function_file)
@@ -18,6 +20,8 @@ source(polyploid_function_file)
 gen_function_file <- file.path(script.basename, 'general_functions.r')
 #gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
 source(gen_function_file)
+
+print('loaded packages')
 
 ### LOAD INPUTS ###
 vcf_in <- args[1]
