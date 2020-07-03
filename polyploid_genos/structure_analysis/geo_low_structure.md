@@ -83,10 +83,13 @@ cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/low_geo
 
 bash
 for KT in {1..10};
+  do
   for KR in {1..3};
     do
     qsub lowgeo_structure_k$KT'.'$KR'.sh';
   done;
+done
+
 ```
 
 

@@ -180,7 +180,7 @@ for(i in low_gc_1){
 }
 #31
 table(meta$STATE[low_gc_1_meta_inds])
-# 16 MS, 6 LA, 8 LF, 1 AR
+# 16 MS, 6 LA, 8 FL, 1 AR
 low_gc_1_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
   'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_gc_1_libs.txt', sep = '')
 write.table(meta$LIBRARY[low_gc_1_meta_inds], file = low_gc_1_out_file,
@@ -219,7 +219,7 @@ for(i in low_ec_2){
 }
 # 59
 table(meta$STATE[low_ec_2_meta_inds])
-# 3 GA, 22 ML, 15 NC, 15 SC, 4 VI
+# 3 GA, 22 MD, 15 NC, 15 SC, 4 VA
 low_ec_2_out_file <- paste('/global/cscratch1/sd/grabowsp/sg_ploidy/',
   'polyploid_vcfs/CDS_vcfs/low_geo_samps/', 'low_ec_2_libs.txt', sep = '')
 write.table(meta$LIBRARY[low_ec_2_meta_inds], file = low_ec_2_out_file,
