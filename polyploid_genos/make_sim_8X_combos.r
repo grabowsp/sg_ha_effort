@@ -14,7 +14,7 @@ script.name <- sub(file.arg.name, '',
   rundir_args[grep(file.arg.name, rundir_args)])
 script.basename <- dirname(script.name)
 
-general_function_file <- file.path(script.basename, 'general_functions.r')
+gen_function_file <- file.path(script.basename, 'general_functions.r')
 #gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
 
 source(gen_function_file)
