@@ -69,8 +69,24 @@ OUT_PRE=geo_samp
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/make_sim_8X_genotypes.r $VCF_IN $VCF_HEAD $SIM_COMBO_IN $OUT_DIR $OUT_PRE
 
-
 ```
+### Combos using all 4X sub-populations
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
+
+sbatch make_geo_sim8X_geno_vcfs.sh
+```
+### Combos using 4X sub-pops with 25+ libraries
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/largeSim8X_vcfs
+
+sbatch make_geo_largeSim8X_geno_vcfs.sh
+```
+
+# NEXT STEPS
+* r2 analysis
+* combine vcfs with standard VCFs
+* PCA including standard VCFs
 
 
 

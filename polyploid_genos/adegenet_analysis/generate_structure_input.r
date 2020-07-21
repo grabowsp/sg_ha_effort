@@ -54,6 +54,7 @@ out_file <- file.path(dirname(geno_in_file), out_short)
 n_snps <- as.numeric(input_args[3])
 
 #geno_type <- 'all_tet'
+#geno_type <- 'everything' # to generate each kind with same SNP set
 geno_type <- input_args[4]
 
 ###############
@@ -66,37 +67,101 @@ keep_snp_names <- colnames(keep_genos)
 
 ploidy_vec <- gen_tot$ploidy
 
-struc_list <- list()
-
-for(i in seq(nrow(keep_genos))){
-  struc_list[[i]] <- gen_struc_genos(genotypes = keep_genos[i, ], 
-    lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i], 
-    geno_type = geno_type)
+if(geno_type != 'everything'){
+  struc_list <- list()
+  #
+  for(i in seq(nrow(keep_genos))){
+    struc_list[[i]] <- gen_struc_genos(genotypes = keep_genos[i, ], 
+      lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i], 
+      geno_type = geno_type)
+  }
+  #
+  if(geno_type == 'all_dip'){
+    struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 2), 
+      ncol = (ncol(struc_list[[1]])-1))
+  }else if(geno_type == 'pseudohap'){
+    struc_mat <- matrix(data = NA, nrow = length(struc_list),
+      ncol = (ncol(struc_list[[1]])-1))
+  }else{
+    struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4), 
+      ncol = (ncol(struc_list[[1]])-1))
+  }
+  #
+  if(geno_type == 'pseudohap'){
+    for(j in seq(length(struc_list))){
+      struc_mat[j, ] <- struc_list[[j]][-1]
+    }
+    lib_vec <- unlist(lapply(struc_list, function(x) x[1]))
+  } else {
+    tmp_ind <- 1
+    #
+    for(j in seq(length(struc_list))){
+      mat_inds <- c(tmp_ind:((tmp_ind-1) + nrow(struc_list[[j]])))
+      struc_mat[mat_inds, ] <- matrix(
+        data = unlist(struc_list[[j]][, -1]), nrow = nrow(struc_list[[j]]))
+      tmp_ind <- tmp_ind + nrow(struc_list[[j]])
+    }
+    #
+    lib_vec <- unlist(lapply(struc_list, function(x) x[,1]))
+  }
+  rownames(struc_mat) <- lib_vec
+  colnames(struc_mat) <- keep_snp_names
 }
 
-if(geno_type == 'all_dip'){
-  struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 2), 
-    ncol = (ncol(struc_list[[1]])-1))
-}else{
-  struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4), 
-    ncol = (ncol(struc_list[[1]])-1))
-}
-
-tmp_ind <- 1
-
-for(j in seq(length(struc_list))){
-  mat_inds <- c(tmp_ind:((tmp_ind-1) + nrow(struc_list[[j]])))
-  struc_mat[mat_inds, ] <- matrix(
-    data = unlist(struc_list[[j]][, -1]), nrow = nrow(struc_list[[j]]))
-  tmp_ind <- tmp_ind + nrow(struc_list[[j]])
-}
-
-lib_vec <- unlist(lapply(struc_list, function(x) x[,1]))
-
-rownames(struc_mat) <- lib_vec
-colnames(struc_mat) <- keep_snp_names
-
-write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T, 
+write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T,
   col.names = T)
 
+if(geno_type == 'everything'){
+  big_struc_list <- list()
+  type_list <- c('all_tet', 'all_dip', 'part_NA', 'pseudohap')
+  #
+  for(TL in type_list){
+    struc_list <- list()
+    #
+    for(i in seq(nrow(keep_genos))){
+      struc_list[[i]] <- gen_struc_genos(genotypes = keep_genos[i, ],
+        lib_name = rownames(keep_genos)[i], ploidy = ploidy_vec[i],
+        geno_type = TL)
+    }
+    #
+    if(geno_type == 'all_dip'){
+      struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 2),
+        ncol = (ncol(struc_list[[1]])-1))
+    }else if(geno_type == 'pseudohap'){
+      struc_mat <- matrix(data = NA, nrow = length(struc_list),
+        ncol = (ncol(struc_list[[1]])-1))
+    }else{
+      struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4),
+        ncol = (ncol(struc_list[[1]])-1))
+    }
+    #
+    if(geno_type == 'pseudohap'){
+      for(j in seq(length(struc_list))){
+        struc_mat[j, ] <- struc_list[[j]][-1]
+      }
+      lib_vec <- unlist(lapply(struc_list, function(x) x[1]))
+    } else {
+      tmp_ind <- 1
+      #
+      for(j in seq(length(struc_list))){
+        mat_inds <- c(tmp_ind:((tmp_ind-1) + nrow(struc_list[[j]])))
+        struc_mat[mat_inds, ] <- matrix(
+          data = unlist(struc_list[[j]][, -1]), nrow = nrow(struc_list[[j]]))
+        tmp_ind <- tmp_ind + nrow(struc_list[[j]])
+      }
+      #
+      lib_vec <- unlist(lapply(struc_list, function(x) x[,1]))
+    }
+    rownames(struc_mat) <- lib_vec
+    colnames(struc_mat) <- keep_snp_names
+    big_struc_list[[type_list]] <- struc_mat
+  }
+  for(TL in type_list){
+    tmp_out_file <- paste(out_file, TL, sep = '_')
+    write.table(big_struc_list[[TL]], file = tmp_out_file, quote = F, 
+      sep = '\t', row.names = T, col.names = T)
+  }
+}
+
+quit(save = 'no')
 

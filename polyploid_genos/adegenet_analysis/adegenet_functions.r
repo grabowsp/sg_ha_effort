@@ -124,6 +124,8 @@ gen_struc_genos <- function(genotypes, lib_name, ploidy,
   #        NA in lines 3 and 4; 
   #        I suspect this type of genotype will cause an error in STRUCTURE
   #          but I'm not sure yet
+  #    4) pseudohap = 1 line for each sample, allele is chosen randomly from
+  #        alleles in the genotype
   # INPUTS
   # genotypes = vector of genotypes, typically from genlight object; 
   #   for ploidy = 2: 0 = HOM REF; 2 = HOM ALT
@@ -145,17 +147,36 @@ gen_struc_genos <- function(genotypes, lib_name, ploidy,
   ##########
   if(geno_type == 'all_dip'){
     tmp_struc <- matrix(nrow = 2, ncol = length(genotypes), NA)
+  } else if(geno_type == 'pseudohap'){
+    tmp_struc <- rep(NA, times = length(genotypes))
   } else{
     tmp_struc <- matrix(nrow = 4, ncol = length(genotypes), NA)
   }
   tmp_na_inds <- which(is.na(genotypes))
-  tmp_struc[, tmp_na_inds] <- -9
+  if(geno_type == 'pseudohap'){
+    tmp_struc[tmp_na_inds] <- -9
+  } else{
+    tmp_struc[, tmp_na_inds] <- -9
+  }
   #
   hom_ref <- which(genotypes == 0)
   A1_inds <- which(genotypes == 1)
   A2_inds <- which(genotypes == 2)
   A3_inds <- which(genotypes == 3)
   A4_inds <- which(genotypes == 4)
+  #
+  if(geno_type == 'pseudohap'){
+    tmp_struc[hom_ref] <- 1
+    for(i in A1_inds){
+      tmp_struc[i] <- sample(c(1,1,1,2), size = 1)
+    }
+    for(j in A2_inds){
+      tmp_struc[j] <- sample(c(1,1,2,2), size = 1)
+    }
+    for(k in A3_inds){
+      tmp_struc[k] <- sample(c(1,2,2,2), size = 1)
+    }
+  } else {
   if(ploidy == 2){
     if(geno_type == 'all_tet'){
       tmp_struc[ , hom_ref] <- 1
@@ -204,7 +225,12 @@ gen_struc_genos <- function(genotypes, lib_name, ploidy,
       tmp_struc[ , A4_inds] <- 2
     }
   }
-  struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  }
+  if(geno_type == 'pseudohap'){
+    struc_df <- c(lib_name, as.character(tmp_struc))
+  } else{
+    struc_df <- data.frame(lib = lib_name, tmp_struc, stringsAsFactors = F)
+  }
   return(struc_df)
 }
 
