@@ -81,7 +81,7 @@ if(geno_type != 'everything'){
       ncol = (ncol(struc_list[[1]])-1))
   }else if(geno_type == 'pseudohap'){
     struc_mat <- matrix(data = NA, nrow = length(struc_list),
-      ncol = (ncol(struc_list[[1]])-1))
+      ncol = (length(struc_list[[1]])-1))
   }else{
     struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4), 
       ncol = (ncol(struc_list[[1]])-1))
@@ -124,18 +124,18 @@ if(geno_type == 'everything'){
         geno_type = TL)
     }
     #
-    if(geno_type == 'all_dip'){
+    if(TL == 'all_dip'){
       struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 2),
         ncol = (ncol(struc_list[[1]])-1))
-    }else if(geno_type == 'pseudohap'){
+    }else if(TL == 'pseudohap'){
       struc_mat <- matrix(data = NA, nrow = length(struc_list),
-        ncol = (ncol(struc_list[[1]])-1))
+        ncol = (length(struc_list[[1]])-1))
     }else{
       struc_mat <- matrix(data = NA, nrow = (length(struc_list) * 4),
         ncol = (ncol(struc_list[[1]])-1))
     }
     #
-    if(geno_type == 'pseudohap'){
+    if(TL == 'pseudohap'){
       for(j in seq(length(struc_list))){
         struc_mat[j, ] <- struc_list[[j]][-1]
       }
@@ -154,7 +154,7 @@ if(geno_type == 'everything'){
     }
     rownames(struc_mat) <- lib_vec
     colnames(struc_mat) <- keep_snp_names
-    big_struc_list[[type_list]] <- struc_mat
+    big_struc_list[[TL]] <- struc_mat
   }
   for(TL in type_list){
     tmp_out_file <- paste(out_file, TL, sep = '_')
