@@ -227,6 +227,29 @@ PER_SUBSAMP=0.07
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
 $DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
 ```
+#### With 8X cultivars
+* Total of 8,495,920 SNPs in all the chromosome genlight objects
+* Want ~ 500k SNPs - will select 6.5% of the SNPs
+* Selected 552,225 SNPs
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/combo.sub.polyploid.CDS.expandgeosamps.genlight.rds`
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/
+
+FILE_SUB=Chr*expandgeosamps.genlight.rds
+
+OUT_NAME=combo.sub.polyploid.CDS.expandgeosamps.genlight.rds
+
+PER_SUBSAMP=0.065
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \
+$DATA_DIR '*'$FILE_SUB $OUT_NAME $PER_SUBSAMP
+```
+
 
 ## "Upland" and "Lowland" Samples
 * based on the 'geosamps' PCA results

@@ -106,10 +106,10 @@ if(geno_type != 'everything'){
   }
   rownames(struc_mat) <- lib_vec
   colnames(struc_mat) <- keep_snp_names
+  #
+  write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T,
+    col.names = T)
 }
-
-write.table(struc_mat, file = out_file, quote = F, sep = '\t', row.names = T,
-  col.names = T)
 
 if(geno_type == 'everything'){
   big_struc_list <- list()
