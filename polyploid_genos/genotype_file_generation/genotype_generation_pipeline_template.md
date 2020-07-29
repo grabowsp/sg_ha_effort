@@ -222,7 +222,7 @@ source activate r_adegenet_env
 
 # FILE_SUB may need to be hardcoded (without the $SAMPSET variable) - try that
 #   if there is an issue
-FILE_SUB=Chr*$SAMPSET'.genlight.rds'
+FILE_SUB=$SAMPSET'.genlight.rds'
 OUT_NAME=combo.sub.polyploid.CDS.$SAMPSET'.genlight.rds'
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \

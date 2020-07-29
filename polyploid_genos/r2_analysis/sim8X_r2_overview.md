@@ -40,5 +40,45 @@ sbatch calc_r2_Chr04_Chr06.sh
 sbatch calc_r2_Chr07_Chr09.sh
 ```
 
+### Consolidate Results
+* Rscript
+  * `~/consolidate_r2_results.r`
+#### Submit job
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results
 
+sbatch consolidate_sim8X_r2_results.sh
+```
+#### Submit file
+```
+#!/bin/bash
+#SBATCH -D .
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=2
+#SBATCH -A plant
+#SBATCH -C haswell
+#SBATCH --mem=16G
+#SBATCH --qos=genepool_shared
+#SBATCH -t 24:00:00
+#SBATCH --mail-user pgrabowski@hudsonalpha.org
+#SBATCH --mail-type=BEGIN
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=END
+
+module load python/3.7-anaconda-2019.07
+source activate /global/homes/g/grabowsp/.conda/envs/R_analysis
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results/
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results/
+
+FILE_SUF=sim8X_subgroups
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/\
+r2_analysis/consolidate_r2_results.r \
+$DATA_DIR $FILE_SUF
+
+```
+
+* CONTINUE FROM HERE
 

@@ -73,14 +73,12 @@ for CHROM in 01K 01N 02K 02N 03K 03N 04K 04N 05K 05N;
   done
 ```
 
-* CONTINUE FROM HERE
-
 ## Generate 100k-line subfiles
 ```
 # Go to directory with VCFs to split
-#$&# cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/
 
-#$&# SAMPSET=geosamps
+SAMPSET=lowexpand
 
 for CN in {01..09};
 do
@@ -97,26 +95,26 @@ done
 
 ## Generate VCF header file for subfiles
 ### Output
-#$&# * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samp/CDS.geosamps.vcf.header.txt`
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/CDS.lowexpand.vcf.header.txt`
 ### Commands to generate Output
 ```
 # go to directory with genotype files
-#$&# cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/
 
-#$&# SAMPSET=geosamps
+SAMPSET=lowexpand
 
 head -5 Chr01K.polyploid.CDS.$SAMPSET'.vcf_00' | tail -1 > \
 CDS.$SAMPSET'.vcf.header.txt'
 ```
 
 ## Generate `genlight` Object
-#$&# * use 0.002 as MAF cutoff
+#$&# * use 0.003 as MAF cutoff
   * between 3 and 6 copies of minor allele at MAF
 ### Submit job
 ```
-#$&# cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/
 
-#$&# sbatch gen_geo_genlight.sh
+sbatch gen_lowexpand_genlight.sh
 ```
 ### Example of submit script
 ```
@@ -137,15 +135,15 @@ CDS.$SAMPSET'.vcf.header.txt'
 module load python/3.7-anaconda-2019.07
 source activate /global/homes/g/grabowsp/.conda/envs/r_adegenet_env
 
-#$&# DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/
 
 cd $DATA_DIR
 
-#$&# HEADER_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt
+HEADER_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/CDS.lowexpand.vcf.header.txt
 
-#$&# SAMPSET=geosamps
+SAMPSET=lowexpand
 
-#$&# MAF_CUT=0.002
+MAF_CUT=0.003
 
 for CHR_N in {01..09};
   do
@@ -162,9 +160,9 @@ for CHR_N in {01..09};
 ## Generate genome-wide subsampled `genlight` object
 ### Output
 * on Cori
-#$&#  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/combo.sub.polyploid.CDS.geosamps.genlight.rds`
-#$&#    * 772 samples
-#$&#    * 592,150 SNPs
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/combo.sub.polyploid.CDS.lowexpand.genlight.rds`
+    * 486 samples
+    * 360,952 SNPs
 ### Select Subsampling level
 ```
 module load python/3.7-anaconda-2019.07
@@ -175,9 +173,10 @@ library(adegenet)
 
 # adjust these variables
 ###
-#$&# data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/'
+data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/'
 
-#$&# goal_nsnps <- 5e5
+goal_nsnps <- 486/772*5e5
+# [1] 314766.8
 ###
 
 file_vec <- system(paste('ls ', data_dir, 'Chr*genlight.rds', sep = ''), 
@@ -196,8 +195,8 @@ tot_snps <- sum(n_snp_vec)
 goal_sub <- goal_nsnps/tot_snps
 
 print(goal_sub)
-#$&# [1] 0.05910562
-# I deciede to use 0.07
+# [1] 0.04360129
+# I deciede to use 0.05
 ```
 ### Generate object
 ```
@@ -206,20 +205,20 @@ module load python/3.7-anaconda-2019.07
 source activate r_adegenet_env
 
 # go to directory where want to run script
-#$&# cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/ 
 
 # directory with chromosome genlight objects
-#$&# DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/
 
 # how sample set is used in file names
-#$&# SAMPSET=geosamps
+SAMPSET=lowexpand
 
 # percentage of total SNPs to select
-#$&# PER_SUBSAMP=0.07
+PER_SUBSAMP=0.05
 
 # FILE_SUB may need to be hardcoded (without the $SAMPSET variable) - try that
 #   if there is an issue
-FILE_SUB=Chr*$SAMPSET'.genlight.rds'
+FILE_SUB=$SAMPSET'.genlight.rds'
 OUT_NAME=combo.sub.polyploid.CDS.$SAMPSET'.genlight.rds'
 
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/subsample_genlight.r \

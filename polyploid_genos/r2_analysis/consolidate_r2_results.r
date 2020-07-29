@@ -33,10 +33,10 @@ res_files_suf <- args[2]
 
 ### SET OUTPUTS ###
 
-chrom_out_file <- paste(data_dir, 'Chromosome.' res_files_suf, '.r2.rds', 
+chrom_out_file <- paste(data_dir, 'Chromosome.', res_files_suf, '.r2.rds', 
   sep = '')
 
-combo_out_file <- paste(data_dir, 'combined.' res_files_suf, '.r2.rds', 
+combo_out_file <- paste(data_dir, 'combined.', res_files_suf, '.r2.rds', 
   sep = '')
 
 ### SET VARIABLES ### 
