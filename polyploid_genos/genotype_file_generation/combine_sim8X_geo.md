@@ -28,6 +28,22 @@
 * convert merged subfiles back to tetrasomic genotypes
 
 ## Convert subfile to coded disomic genotypes
+### Test
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
+
+```
+
+
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
