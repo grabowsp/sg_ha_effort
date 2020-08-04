@@ -40,10 +40,10 @@ dip_genos <- c('2/0', '2/1', '1/2', '0/2')
 ##################
 
 for(i in seq(length(tet_genos))){
-  in_vcf[in_vcf == tet_genos[i]] <- dip_genos[i]
+  vcf_1[vcf_1 == tet_genos[i]] <- dip_genos[i]
 }
 
-write.table(in_vcf, file = out_file, quote = F, sep = '\t', row.names = F,
+write.table(vcf_1, file = out_file, quote = F, sep = '\t', row.names = F,
   col.names = F)
 
 quit(save = 'no')
