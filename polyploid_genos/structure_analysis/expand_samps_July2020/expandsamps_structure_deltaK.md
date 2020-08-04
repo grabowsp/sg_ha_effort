@@ -49,8 +49,11 @@ Rscript /home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/structure_a
 ```
 #### Output files
 * Interpretation:
+  * K=2 is best; K=3 is okay, other K's don't show much support
 * Figure
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/all_tet/expandgeo_alltet_LnProbData_deltaK.pdf`
 * Table
+  * `/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/all_tet/expandgeo_alltet_LnProbData_deltaK.txt`
 
 
 

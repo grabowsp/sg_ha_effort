@@ -71,4 +71,18 @@ cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_sam
 sbatch lowexpand_PCA.sh
 ```
 
+## Generate `lowexpand` PCA figures
+* `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/combo.sub.polyploid.CDS.lowexpand.genlight.PCAresults.figs.pdf`
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps
+
+DATA_FILE=combo.sub.polyploid.CDS.lowexpand.genlight.PCAresults.rds
+
+PLOT_PRE=Lowland_expanded_samples
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/pca_figs_adegenet.r $DATA_FILE $PLOT_PRE
+```
 

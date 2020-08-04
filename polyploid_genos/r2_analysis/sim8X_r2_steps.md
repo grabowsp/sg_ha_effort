@@ -39,10 +39,14 @@ sbatch calc_r2_Chr01_Chr03.sh
 sbatch calc_r2_Chr04_Chr06.sh
 sbatch calc_r2_Chr07_Chr09.sh
 ```
-
 ### Consolidate Results
 * Rscript
   * `~/consolidate_r2_results.r`
+#### All sim8X pops
+* Consolidated by chromosome
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results/Chromosome.sim8X_subgroups.r2.rds`
+* Consolidated genome-wide
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results/combined.sim8X_subgroups.r2.rds`
 #### Submit job
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results
@@ -54,11 +58,11 @@ sbatch consolidate_sim8X_r2_results.sh
 #!/bin/bash
 #SBATCH -D .
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=2
+#SBATCH --cpus-per-task=1
 #SBATCH -A plant
 #SBATCH -C haswell
-#SBATCH --mem=16G
-#SBATCH --qos=genepool_shared
+#SBATCH --mem=118G
+#SBATCH --qos=genepool
 #SBATCH -t 24:00:00
 #SBATCH --mail-user pgrabowski@hudsonalpha.org
 #SBATCH --mail-type=BEGIN
@@ -80,5 +84,17 @@ $DATA_DIR $FILE_SUF
 
 ```
 
-* CONTINUE FROM HERE
+## Generate r2 values for windows
+### All sim8X pops
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_r2_results/
+
+sbatch gen_chrom_mean_r2_windows.sh
+sbatch gen_chrom_hi_r2_windows.sh
+
+sbatch gen_combo_mean_r2_windows.sh
+sbatch gen_combo_hi_r2_windows.sh
+
+```
+
 

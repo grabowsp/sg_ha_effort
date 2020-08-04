@@ -1,5 +1,5 @@
-# Steps and notes for running STRUCTURE on 'expandsamps', the expanded 
-#    4X and 8X samples
+# Steps and notes for running STRUCTURE on 'lowexpand', the upland samples
+#   in the expanded geographic 4X and 8X samples
 
 ## Test robustness of results by  using different types of genotypes
 * all samples with 4 lines
@@ -22,7 +22,6 @@
 #### extraparams
 * `generic.extraparams`
 
-
 ## Generate Genotypes
 * 25k SNPs, 10k burnin, 30k run
 ### Make Genotypes with R
@@ -30,11 +29,11 @@
 module load python/3.7-anaconda-2019.07
 source activate r_adegenet_env
 
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps
 
-IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/combo.sub.polyploid.CDS.expandgeosamps.genlight.rds
+IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps/combo.sub.polyploid.CDS.lowexpand.genlight.rds
 
-OUT_NAME=expandgeo_25k.strucgenos.txt
+OUT_NAME=lowexpand_25k.strucgenos.txt
 N_SNPS=25000
 GENO_TYPE=everything
 
@@ -43,19 +42,20 @@ $IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
 ```
 ### Transfer genotype files to HA
 ```
-cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/lowexpand_samps
 
-scp expandgeo_25k.strucgenos.txt* grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo
+scp lowexpand_25k.strucgenos.txt* grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/lowexpand
 ```
 
 ## Run `all_tet` K=1 to K=10
 ### Soft link the parameter files
 ```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/all_tet
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/upexpand/all_tet
 
 ln -s /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/tet_generic.mainparams ./tet_generic.mainparams
 ln -s /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/generic.extraparams ./generic.extraparams
 ```
+* CONTINUE FROM HERE
 ### Generate submission scripts
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
@@ -127,6 +127,7 @@ for SUB_FILE in expandgeo_structure_*sh;
   done
 ```
 ### Submit Jobs
+* NEED TO DO THIS
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/all_dip
 
@@ -161,19 +162,7 @@ for SUB_FILE in expandgeo_structure_*sh;
   done
 ```
 ### Submit Jobs
-```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/part_NA
-
-bash
-for KT in {1..10};
-  do
-  for KR in {1..3};
-    do
-    qsub expandgeo_structure_partNA_k$KT'.'$KR'.sh';
-  done;
-done
-```
-
+* NEED TO DO THIS
 
 ## Run `pseudohap` K=1 to K=10
 ### Soft link the parameter files

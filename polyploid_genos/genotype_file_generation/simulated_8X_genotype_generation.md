@@ -78,3 +78,96 @@ for VCF_IN in `ls $IN_DIR*vcf_*`;
 
 ```
 
+## Convert Allele-count VCFs to standard-style VCFs
+### Steps
+* Generate sim8X vcf
+  * make header that includes Chr info
+  * sort
+  * tabix
+  * convert to BCF
+* Generate geo vcf
+  * adjust header to include Chr info
+  * sort
+  * tabix
+  * convert to BCF
+
+### Generate sim8X sample header
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
+
+head -1 Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_00 > CDS.sim8X.vcf.header.txt
+# add '#' to beginning of line
+```
+### Generate vcf formatting header
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+head -4 Chr01K.polyploid.CDS.geosamps.vcf_00 > vcf_format_header.txt 
+```
+* add Chr info to vcf_format_header.txt
+```
+##contig=<ID=Chr01K,length=56546490>
+##contig=<ID=Chr01N,length=66475219>
+##contig=<ID=Chr02K,length=68340493>
+##contig=<ID=Chr02N,length=69773881>
+##contig=<ID=Chr03K,length=63841035>
+##contig=<ID=Chr03N,length=69486008>
+##contig=<ID=Chr04K,length=47708993>
+##contig=<ID=Chr04N,length=50282576>
+##contig=<ID=Chr05K,length=61896298>
+##contig=<ID=Chr05N,length=71719776>
+##contig=<ID=Chr06K,length=48106579>
+##contig=<ID=Chr06N,length=53044726>
+##contig=<ID=Chr07K,length=52492986>
+##contig=<ID=Chr07N,length=50739414>
+##contig=<ID=Chr08K,length=55599782>
+##contig=<ID=Chr08N,length=50668275>
+##contig=<ID=Chr09K,length=70504668>
+##contig=<ID=Chr09N,length=82442687>
+```
+:
+### Generate adjusted VCF files and merge
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
+
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+SIM8X_VCF_IN=Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_00
+
+FORMAT_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/vcf_format_header.txt
+
+SIM8X_SAMP_HEAD=CDS.sim8X.vcf.header.txt
+
+cat $FORMAT_HEAD $SIM8X_SAMP_HEAD $SIM8X_VCF_IN > tmp_vcf
+
+bcftools sort tmp_vcf -Ov -o tmp_vcf_sort
+bgzip tmp_vcf_sort 
+tabix -p vcf tmp_vcf_sort.gz
+
+# make temporary geosamps file
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+
+GEO_VCF_IN=Chr01K.polyploid.CDS.geosamps.vcf_00
+
+FORMAT_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/vcf_format_header.txt
+
+GEO_SAMP_HEAD=CDS.geosamps.vcf.header.txt
+
+tail -n+5 $GEO_VCF_IN > tmp_vcf_1
+
+cat $FORMAT_HEAD tmp_vcf_1 > tmp_geo_vcf
+
+bcftools sort tmp_geo_vcf -Ov -o tmp_geo_vcf_sort
+bgzip tmp_geo_vcf_sort
+tabix -p vcf tmp_geo_vcf_sort.gz
+
+# try merging
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/
+
+SIM_TO_MERGE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/tmp_vcf_sort.gz
+
+GEO_TO_MERGE=tmp_geo_vcf_sort.gz
+
+bcftools merge $GEO_TO_MERGE $SIM_TO_MERGE -Oz -o tmp_merged.vcf.gz
+```
