@@ -111,11 +111,11 @@ source activate R_analysis
 
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
 
-IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_01
+#IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_01
 
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_sim8X_VCF_to_standard.r $IN_VCF
+#Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_sim8X_VCF_to_standard.r $IN_VCF
 
-for VN in {02..10};
+for VN in {00..10};
 do
 echo $VN;
 IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_$VN
@@ -141,6 +141,7 @@ for TN in {01..10};
 do
 echo $TN
 IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_$TN
+tail -n+2 $IN_VCF > Chr01K.polyploid.CDS.sim8X.reformat_$TN
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR;
 done
 
