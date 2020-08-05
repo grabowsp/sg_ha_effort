@@ -10,7 +10,7 @@ args = commandArgs(trailingOnly = TRUE)
 ### INPUTS ###
 vcf_in <- args[1]
 
-vcf_a <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
+vcf_a <- read.table(vcf_in, header = T, stringsAsFactors = F, sep = '\t')
 
 ### SET OUTPUTS ###
 out_file <- gsub('AltDosage', 'standard', vcf_in)

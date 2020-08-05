@@ -104,5 +104,73 @@ IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
 
 ```
+### Change sim8X Chr01K vcfs to standard tet format
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
 
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
+
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_01
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_sim8X_VCF_to_standard.r $IN_VCF
+
+for VN in {02..10};
+do
+echo $VN;
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_$VN
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_sim8X_VCF_to_standard.r $IN_VCF;
+done
+
+```
+### Convert sim8X to coded
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_00
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
+
+for TN in {01..10};
+do
+echo $TN
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_$TN
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR;
+done
+
+```
+### Concatenate sim8X Chr01K subfiles
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+FORMAT_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/vcf_format_header.txt
+
+SIM8X_SAMP_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/CDS.sim8X.vcf.header.txt
+
+OUT_FILE=Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_dipcode.vcf
+
+cat $FORMAT_HEAD $SIM8X_SAMP_HEAD Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_dipcode_* > $OUT_FILE
+
+### Sort, bgzip, and tabix the new vcf
+
+* need to re-run this - I might need to define FILTER, INFO, and FORMAT in the
+vcf header
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+bcftools sort Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_dipcode.vcf -Ov -o Chr01K_sim8X_dipcode.vcf_sort
+
+bgzip Chr01K_sim8X_dipcode.vcf_sort
+
+tabix -p vcf Chr01K_dipcode.vcf_sort.gz
+```
 
