@@ -1,20 +1,21 @@
 # Script to convert allele-count simulated 8X VCFs to the same format as
 #  standard VCFs so VCFs can be merged
 
-module load python/3.7-anaconda-2019.07
-source activate /global/homes/g/grabowsp/.conda/envs/R_analysis
+#module load python/3.7-anaconda-2019.07
+#source activate /global/homes/g/grabowsp/.conda/envs/R_analysis
 
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/'
-
-in_file_short <- 'Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_AltDosage.vcf_00'
-
-in_file <- paste(data_dir, in_file_short, sep = '')
+args = commandArgs(trailingOnly = TRUE)
 
 
-out_file <- gsub('AltDosage', 'standard', in_file)
+### INPUTS ###
+vcf_in <- args[1]
 
+vcf_a <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
 
-vcf_a <- read.table(in_file, header = T, sep = '\t', stringsAsFactors = F)
+### SET OUTPUTS ###
+out_file <- gsub('AltDosage', 'standard', vcf_in)
+
+#####
 
 vcf_b <- vcf_a
 

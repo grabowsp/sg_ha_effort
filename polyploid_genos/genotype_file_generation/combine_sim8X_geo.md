@@ -42,41 +42,67 @@ IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
 
 ```
-
-
+### Rest of Chr01K
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
-gen_function_file <- '/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/general_functions.r'
-source(gen_function_file)
+bash
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
 
 
-in_vcf_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
-
-in_vcf <- read.table(in_vcf_file, header = F, stringsAsFactors = F, sep = '\t')
-
-out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs'
-
-out_dir <- add_slash(out_dir)
-
-out_file_tmp <- rev(unlist(strsplit(in_vcf_file, split = '/')))[1]
-
-out_file_short <- gsub('vcf_', 'vcf_dipcode_', out_file_tmp)
-
-out_file <- paste(out_dir, out_file_short, sep = '')
-
-####
-
-tet_genos <- c('4/0', '3/1', '1/3', '0/4')
-dip_genos <- c('2/0', '2/1', '1/2', '0/2')
-
-for(i in seq(length(tet_genos))){
-  in_vcf[in_vcf == tet_genos[i]] <- dip_genos[i]
-}
-
-
-
-
+for VN in {01..10};
+do
+echo $VN;
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_$VN
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR;
+done
 
 ```
+### combine converted subfiles
+* includes VCF headers generated previously
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+FORMAT_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/vcf_format_header.txt
+
+SAMP_HEAD=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/CDS.geosamps.vcf.header.txt
+
+OUT_FILE=Chr01K.polyploid.CDS.geosamps.vcf_dipcode.vcf
+
+cat $FORMAT_HEAD $SAMP_HEAD \
+Chr01K.polyploid.CDS.geosamps.vcf_dipcode_* > $OUT_FILE
+
+```
+### Sort, bgzip, and tabix the new vcf
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+bcftools sort Chr01K.polyploid.CDS.geosamps.vcf_dipcode.vcf -Ov -o Chr01K_dipcode.vcf_sort
+
+bgzip Chr01K_dipcode.vcf_sort
+
+tabix -p vcf Chr01K_dipcode.vcf_sort.gz
+```
+### Test with sim8X vcf
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+ 
+OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_00
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
+
+```
+
+
