@@ -43,6 +43,8 @@ for(i in seq(length(tet_genos))){
   vcf_1[vcf_1 == tet_genos[i]] <- dip_genos[i]
 }
 
+vcf_1[,5] <- paste(vcf_1[,5], ',N', sep = '')
+
 write.table(vcf_1, file = out_file, quote = F, sep = '\t', row.names = F,
   col.names = F)
 

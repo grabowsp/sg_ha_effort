@@ -90,6 +90,10 @@ bgzip Chr01K_dipcode.vcf_sort
 
 tabix -p vcf Chr01K_dipcode.vcf_sort.gz
 ```
+
+
+
+
 ### Test with sim8X vcf
 ```
 module load python/3.7-anaconda-2019.07
@@ -128,20 +132,18 @@ done
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
-
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
 
 OUT_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
 
-IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_00
+#IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_00
 
-Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
+#Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR
 
-for TN in {01..10};
+for TN in {00..10};
 do
 echo $TN
 IN_VCF=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_$TN
-tail -n+2 $IN_VCF > Chr01K.polyploid.CDS.sim8X.reformat_$TN
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_to_dipcoded_vcf.r $IN_VCF $OUT_DIR;
 done
 
@@ -172,6 +174,26 @@ bcftools sort Chr01K.polyploid.CDS.geosamps.geo_samp_sim8X_standard.vcf_dipcode.
 
 bgzip Chr01K_sim8X_dipcode.vcf_sort
 
-tabix -p vcf Chr01K_dipcode.vcf_sort.gz
+tabix -p vcf Chr01K_sim8X_dipcode.vcf_sort.gz
 ```
+
+### Try merging sim8X and geo
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8Xgeo_combo
+
+SIM_TO_MERGE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs/Chr01K_sim8X_dipcode.vcf_sort.gz
+
+GEO_TO_MERGE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs/Chr01K_dipcode.vcf_sort.gz
+
+OUT_FILE=Chr01K_geoSim8Xmerge_dipcode.vcf.gz
+
+bcftools merge $GEO_TO_MERGE $SIM_TO_MERGE -Oz -o $OUT_FILE
+
+
+
+```
+
 
