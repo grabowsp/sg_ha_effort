@@ -92,8 +92,6 @@ tabix -p vcf Chr01K_dipcode.vcf_sort.gz
 ```
 
 
-
-
 ### Test with sim8X vcf
 ```
 module load python/3.7-anaconda-2019.07
@@ -192,8 +190,17 @@ OUT_FILE=Chr01K_geoSim8Xmerge_dipcode.vcf.gz
 
 bcftools merge $GEO_TO_MERGE $SIM_TO_MERGE -Oz -o $OUT_FILE
 
+```
 
+#### Make subfiles
+```
+module load python/3.7-anaconda-2019.07
+source activate gen_bioinformatics
 
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8Xgeo_combo
+
+bgzip -cd Chr01K_geoSim8Xmerge_dipcode.vcf.gz \
+| split -l 100000 -d - Chr01K_geoSim8Xmerge_dipcode.vcf_
 ```
 
 

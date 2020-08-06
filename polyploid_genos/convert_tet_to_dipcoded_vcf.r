@@ -22,14 +22,26 @@ source(gen_function_file)
 ### LOAD INPUTS ###
 vcf_in <- args[1]
 #vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/Chr01K.polyploid.CDS.geosamps.vcf_00'
+#vcf_in <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8Xgeo_combo/Chr01K_geoSim8Xmerge_dipcode.vcf_00'
 vcf_1 <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
 
 ### SET OUTPUT ###
-out_dir <- args[2]
+convert_type <- as.numeric(args[2])
+# 1 = tetrasomic to diploid code
+# 2 = diploid code to tetrasomic
+# convert_type <- 1
+
+out_dir <- args[3]
 #out_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs'
 out_dir <- add_slash(out_dir)
 
-out_file_short <- gsub('vcf_', 'vcf_dipcode_', basename(vcf_in))
+if(convert_type == 1){
+  out_file_short <- gsub('vcf_', 'vcf_dipcode_', basename(vcf_in))
+}
+if(convert_type == 2){
+  out_file_short <- gsub('dipcode', 'tet', basename(vcf_in))
+}
+
 out_file <- paste(out_dir, out_file_short, sep = '')
 
 ### SET VARIABLES ###
@@ -39,11 +51,20 @@ dip_genos <- c('2/0', '2/1', '1/2', '0/2')
 
 ##################
 
-for(i in seq(length(tet_genos))){
-  vcf_1[vcf_1 == tet_genos[i]] <- dip_genos[i]
+if(convert_type == 1){
+  for(i in seq(length(tet_genos))){
+    vcf_1[vcf_1 == tet_genos[i]] <- dip_genos[i]
+  }
+  vcf_1[,5] <- paste(vcf_1[,5], ',N', sep = '')
 }
 
-vcf_1[,5] <- paste(vcf_1[,5], ',N', sep = '')
+if(convert_type == 2){
+  for(i in seq(length(tet_genos))){
+    vcf_1[vcf_1 == dip_genos[i]] <- tet_genos[i]
+  }
+  vcf_1[,5] <- unlist(lapply(strsplit(vcf_1[,5], split = ','), 
+    function(x) x[1]))
+}
 
 write.table(vcf_1, file = out_file, quote = F, sep = '\t', row.names = F,
   col.names = F)
