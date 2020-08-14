@@ -167,14 +167,23 @@ gen_struc_genos <- function(genotypes, lib_name, ploidy,
   #
   if(geno_type == 'pseudohap'){
     tmp_struc[hom_ref] <- 1
-    for(i in A1_inds){
-      tmp_struc[i] <- sample(c(1,1,1,2), size = 1)
+    if(ploidy == 2){
+      for(i in A1_inds){
+        tmp_struc[i] <- sample(c(1,2), size = 1)
+      }
+      tmp_struc[A2_inds] <- 2
     }
-    for(j in A2_inds){
-      tmp_struc[j] <- sample(c(1,1,2,2), size = 1)
-    }
-    for(k in A3_inds){
-      tmp_struc[k] <- sample(c(1,2,2,2), size = 1)
+    if(ploidy == 4){
+      for(i in A1_inds){
+        tmp_struc[i] <- sample(c(1,1,1,2), size = 1)
+      }
+      for(j in A2_inds){
+        tmp_struc[j] <- sample(c(1,1,2,2), size = 1)
+      }
+      for(k in A3_inds){
+        tmp_struc[k] <- sample(c(1,2,2,2), size = 1)
+      }
+      tmp_struc[A4_inds] <- 2
     }
   } else {
   if(ploidy == 2){
