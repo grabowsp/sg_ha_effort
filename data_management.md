@@ -11,8 +11,8 @@ My NERSC location
 * Official NERSC location
   * `/global/dna/projectdirs/plant/annotation/www/Pvirgatum`
 * My NERSC location
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/ref_stuff/annotation`
-  * `/global/cscratch1/sd/grabowsp/sg_ploidy/ref_stuff/annotation/Pvirgatum_516_v5.1`
+  * `/global/homes/g/grabowsp/data/switchgrass/ref_stuff/Pvirgatum_516_v5.1`
+
 
 ## Switchgrass Resequencing Metadata
 * NERSC Directory

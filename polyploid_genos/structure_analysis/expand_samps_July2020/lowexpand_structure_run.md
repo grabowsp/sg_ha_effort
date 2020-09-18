@@ -50,21 +50,22 @@ scp lowexpand_25k.strucgenos.txt* grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabo
 ## Run `all_tet` K=1 to K=10
 ### Soft link the parameter files
 ```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/upexpand/all_tet
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/lowexpand/all_tet
 
 ln -s /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/tet_generic.mainparams ./tet_generic.mainparams
 ln -s /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/generic.extraparams ./generic.extraparams
 ```
-* CONTINUE FROM HERE
+
 ### Generate submission scripts
+# CONTINUE FROM HERE - EDIT FROM N_SAMPS and beyond
 ```
-cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
-q
+cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/upexpand/all_tet 
+
 bash
-for SUB_FILE in geo_structure*sh;
+for SUB_FILE in upexpand_structure_*sh;
   do
   FILE_SUF=`echo $SUB_FILE | awk -F'[_]' '{print $3}'`
-  sed 's/struc\/geo_v2/struc\/expand_geo\/all_tet/g; s/geosamps_v2_20k_alltet.strucgenos.txt/expandgeo_25k.strucgenos.txt_all_tet/g; s/OUT_NAME=geo_v2_/OUT_NAME=expandgeo_alltet_/g; s/N_SAMPS=772/N_SAMPS=785/g; s/N_SNPS=20000/N_SNPS=25000/g; s/-N struc_/-N alltet_struc_/g' \
+  sed 's/struc\/upexpand/struc\/lowexpand/g; s/upexpand_25k.strucgenos.txt_all_tet/lowexpand_25k.strucgenos.txt_all_tet/g; s/OUT_NAME=upexpand_alltet_/OUT_NAME=lowexpand_alltet_/g; s/N_SAMPS=772/N_SAMPS=785/g; s/N_SNPS=20000/N_SNPS=25000/g; s/-N struc_/-N alltet_struc_/g' \
   $SUB_FILE > ../expand_geo/all_tet/expandgeo_structure_alltet_$FILE_SUF;
   done
 ```

@@ -47,6 +47,7 @@ nreps <- as.numeric(args[3])
 
 samp_set_name <- args[4]
 #samp_set_name <- 'expandgeo_alltet'
+samp_set_name <- sub('_$', '', samp_set_name)
 ##################
 
 ln_prob_vals <- unlist(lapply(strsplit(ln_prob[,1], split = ' '),

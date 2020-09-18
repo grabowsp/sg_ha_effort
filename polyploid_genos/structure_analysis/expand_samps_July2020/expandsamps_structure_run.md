@@ -41,11 +41,30 @@ GENO_TYPE=everything
 Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
 $IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
 ```
+#### Re-make pseudohap genotypes
+```
+module load python/3.7-anaconda-2019.07
+source activate r_adegenet_env
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
+
+IN_FILE=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/combo.sub.polyploid.CDS.expandgeosamps.genlight.rds
+
+OUT_NAME=expandgeo_25k.strucgenos.txt_pseudohap
+N_SNPS=25000
+GENO_TYPE=pseudohap
+
+Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/adegenet_analysis/generate_structure_input.r \
+$IN_FILE $OUT_NAME $N_SNPS $GENO_TYPE
+```
+
 ### Transfer genotype files to HA
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps
 
 scp expandgeo_25k.strucgenos.txt* grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo
+
+scp expandgeo_25k.strucgenos.txt_pseudohap grabowsk@pants.hagsc.org:/home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/expand_geo/pseudohap
 ```
 
 ## Run `all_tet` K=1 to K=10
@@ -59,7 +78,7 @@ ln -s /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/generic.ex
 ### Generate submission scripts
 ```
 cd /home/t4c1/WORK/grabowsk/data/switchgrass/polyploid_genos/struc/geo_v2
-q
+
 bash
 for SUB_FILE in geo_structure*sh;
   do
@@ -173,7 +192,6 @@ for KT in {1..10};
   done;
 done
 ```
-
 
 ## Run `pseudohap` K=1 to K=10
 ### Soft link the parameter files

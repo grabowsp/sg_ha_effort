@@ -23,7 +23,75 @@ so that would only need to add 1 additional character, N, to the ALT column
 * 1/3 : 1/2
 * 0/4 : 0/2
 
-## Convert subfile to coded disomic genotypes
+
+
+
+## Convert subfile to coded disomic genotypes 
+* Steps:
+  * convert tet genotypes to dipcode genotypes for subfiles
+    * includes adding ALT alleles so that bcftools is happy
+  * concatenate the subfiles from a chromosome
+  * sort, bgzip, and tabix single chromosome
+### `geo_samps` files 
+* all steps included in single script
+  * Ran Chr01K as step-by-step test
+  * Ran Chr01N as sh script test
+  * Ran remaining chromosomes in single script
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/convert_vcfs
+
+sbatch tet_to_dipcode_Chr01N.sh
+
+sbatch tet_to_dipcode_Chr02_to_Chr09_KN.sh
+```
+### Simulated 8X files
+* Additional first step is to convert AltDosage genotypes to "standard" format
+* Tried to as many steps in a single script as possible
+  * Chr01K was run as step-by-step test
+  * Chr01N was run as test of shell script
+  * Rest of chromsomsomes run in single scripts
+#### Convert AltDosage to standard file
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs
+
+sbatch convert_AltDosage_standard_Chr01N.sh
+sbatch convert_AltDosage_standard_Chr02_Chr09_KN.sh
+```
+#### Convert to coded disomic file
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8X_vcfs/convert_vcfs
+
+sbatch tet_to_dipcode_Chr01N.sh
+sbatch tet_to_dipcode_Chr02_to_Chr09_KN.sh
+```
+
+## Merge and convert geo_samps and sim8X
+* Steps:
+  * merge dipcoded chromosome VCFs
+  * split merged VCF into 100k line subfiles
+  * convert dipcode subfiles to tetrasomic genotypes
+  * delete dipcoded merged VCFs
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/geo_samps/sim8Xgeo_combo
+
+sbatch merge_convert_geo_sim8X_Chr01N.sh
+
+sbatch  merge_convert_geo_sim8X_Chr02_09.sh
+```
+
+## Delete remaining dipcoded VCFs
+
+
+
+
+
+
+
+
+
+
+
+
 ### Test
 ```
 module load python/3.7-anaconda-2019.07
@@ -89,6 +157,7 @@ bgzip Chr01K_dipcode.vcf_sort
 
 tabix -p vcf Chr01K_dipcode.vcf_sort.gz
 ```
+
 
 
 ### Test with sim8X vcf
@@ -174,6 +243,13 @@ OUT_FILE=Chr01K_geoSim8Xmerge_dipcode.vcf.gz
 
 bcftools merge $GEO_TO_MERGE $SIM_TO_MERGE -Oz -o $OUT_FILE
 
+# save the header
+bcftools merge $GEO_TO_MERGE $SIM_TO_MERGE --print-header > \
+geoSim8Xmerg_header.txt
+
+tail -n 1 geoSim8Xmerg_header.txt > geoSim8Xmerg_samps.txt
+
+
 ```
 
 #### Make subfiles
@@ -208,4 +284,7 @@ Rscript /global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/convert_tet_
 done
 
 ```
+
+
+
 

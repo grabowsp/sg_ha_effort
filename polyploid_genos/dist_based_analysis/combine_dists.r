@@ -43,7 +43,8 @@ for(DF in c(2:length(dist_files))){
   tmp_data <- readRDS(dist_files[DF])
   tot_nSNPs <- tot_nSNPs + tmp_data[[1]]
   tmp_euc_dist <- as.matrix(tmp_data[[2]])
-  tot_euc_dist <- tot_euc_dist + tmp_euc_dist
+  tot_euc_dist <- sqrt(tot_euc_dist^2 + tmp_euc_dist^2)
+# tot_euc_dist <- tot_euc_dist + tmp_euc_dist
   tmp_man_dist <- as.matrix(tmp_data[[3]])
   tot_man_dist <- tot_man_dist + tmp_man_dist
   tot_n_NAs <- tot_n_NAs + tmp_data[[4]]
