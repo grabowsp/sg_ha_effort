@@ -212,6 +212,9 @@ vcf_files <- system(sys_com, intern = T)
 bp_win_size <- 1e5
 snp_win_size <- 1000
 test_k <- 2
+
+n_partitions <- 10
+
 keep_wind_start_pos <- c()
 keep_snp_pos <- c()
 
@@ -239,11 +242,7 @@ for(vf in seq(length(vcf_files))){
   #####
   # Select windows to keep for analysis
   #min_pos <- min(vcf_filt$POS)
-  if(vf == 1){
-    min_pos <- 1
-  } else{
-    min_pos <- next_min_pos
-  }
+  min_pos <- min(vcf_1_filt$POS)
   max_pos <- max(vcf_1_filt$POS)
   #
   wind_list_out_1 <- get_window_inds(vcf = vcf_1_filt, min_pos = min_pos,
@@ -253,26 +252,75 @@ for(vf in seq(length(vcf_files))){
   tmp_wind_start_pos <- wind_list_out_1[[1]]
   next_min_pos <- rev(tmp_wind_start_pos)[1]
   wind_list_1 <- wind_list_out_1[[2]]
-  #
-  # remove the last window to combine with next sub_vcf except for the last
-  #   sub_vcf
-  if(vf == length(vcf_files)){
-    wind_list <- wind_list_1
-  } else{
-    wind_list <- wind_list_1[-length(wind_list_1)]
-    tmp_wind_start_pos <- tmp_wind_start_pos[-length(tmp_wind_start_pos)]
+  wind_list <- wind_list_1
+  
+  tmp_jack_inds <- get_jackknife_window_inds(bp_window_list = wind_list,
+    snp_win_size = snp_win_size, n_part = n_partitions)
+  jack_part_size <- floor(snp_win_size/n_partitions)
+  jack_win_size <- snp_win_size - jack_part_size
+  jack_ew_list <- list()
+  for(tji in seq(length(tmp_jack_inds))){
+    tmp_mat_sub <- geno_mat_1_filt[tmp_jack_inds[[tji]], ]
+    tmp_ew_res <- eigen_window_fixNAs(test_mat = tmp_mat_sub, 
+      win_size = jack_win_size, test_k = test_k, fna.verbose = T)
+    if(vf == 1){
+      jack_ew_list[[tji]] <- tmp_ew_res
+    } else{
+      jack_ew_list[[tji]] <- rbind(jack_ew_list[[tji]], tmp_ew_res)
+    }
   }
+  
+
+  pc1_vec_cols <- grep('PC_1_', colnames(jack_ew_list[[1]]))
+
+# wind1_pc1_jack1 <- jack_ew_list[[1]][1,pc1_vec_cols]
+
+  window_se_vec <- c()
+
+  for(wn in seq(nrow(jack_ew_list[[1]]))){
+    jack_pc_mat[1, ] <- jack_ew_list[[1]][wn,pc1_vec_cols]
+    for(jp in c(2:nrow(jack_pc_mat))){
+      tmp_eigvec <- jack_ew_list[[jp]][wn,pc1_vec_cols]
+      test_dif_1 <- sum(abs(jack_pc_mat[1, ] - tmp_eigvec))
+      test_dif_2 <- sum(abs(jack_pc_mat[1, ] + tmp_eigvec))
+      if(test_dif_2 < test_dif_1){
+        jack_pc_mat[jp, ] <- tmp_eigvec * -1
+      } else{
+        jack_pc_mat[jp, ] <- tmp_eigvec
+      }
+    }
+    #
+    mean_jack_vec <- apply(jack_pc_mat, 2, mean)
+    #
+    jack_samp_se <- c()
+    for(mjv in seq(length(mean_jack_vec))){
+      tmp_jack_dif_sq <- (jack_pc_mat[, mjv] - mean_jack_vec[mjv])^2
+      tmp_samp_se <- sum(tmp_jack_dif_sq)*(9/10)
+      jack_samp_se <- c(jack_samp_se, tmp_samp_se)
+    }
+    #
+    jack_window_se <- mean(jack_samp_se)
+    window_se_vec <- c(window_se_vec, jack_window_se)
+  }
+  
+  noise_variance <- mean(window_se_vec)
+#  [1] 0.0001921484
+
+# then can re-incorporate starting from POS=1, etc
+
+
   ######
   # get sub-samples indices for SNPs in windows to keep and sub-select VCF
   #   and genotype matrix
-  good_inds_1 <- get_subsamp_window_inds(bp_window_list = wind_list,
-    snp_win_size = snp_win_size)
-  vcf_sub_filt <- vcf_1_filt[good_inds_1, ]
-  geno_mat_sub <- geno_mat_1_filt[good_inds_1, ]
-  keep_snp_pos <- c(keep_snp_pos, vcf_sub_filt$POS)
+#  good_inds_1 <- get_subsamp_window_inds(bp_window_list = wind_list,
+#    snp_win_size = snp_win_size)
+  tot_sub_inds <- sort(unique(unlist(tmp_jack_inds)))
+  vcf_sub_filt <- vcf_1_filt[tot_sub_inds, ]
+  geno_mat_sub <- geno_mat_1_filt[tot_sub_inds, ]
+#  keep_snp_pos <- c(keep_snp_pos, vcf_sub_filt$POS)
   # get window starting positions for retained windows
-  keep_wind_start_pos <- c(keep_wind_start_pos, tmp_wind_start_pos[which(unlist(
-    lapply(wind_list, length)) >= snp_win_size)])
+#  keep_wind_start_pos <- c(keep_wind_start_pos, tmp_wind_start_pos[which(unlist(
+#    lapply(wind_list, length)) >= snp_win_size)])
   #
   if(vf != length(vcf_files)){
     remain_inds <- unlist(wind_list_1[length(wind_list_1)])
@@ -282,6 +330,46 @@ for(vf in seq(length(vcf_files))){
   # run eigen_windows
   tmp_fn_ew <- eigen_window_fixNAs(test_mat = geno_mat_sub, 
     win_size = snp_win_size, test_k = test_k, fna.verbose = T)
+
+
+  #
+  # remove the last window to combine with next sub_vcf except for the last
+  #   sub_vcf
+
+  pc1_tot_vec_cols <- grep('PC_1_', colnames(tmp_fn_ew))
+
+
+  tot_pc_mat <- tmp_fn_ew[, pc1_tot_vec_cols]
+  for(tpm in c(2:nrow(tot_pc_mat))){
+    test_comp_1 <- sum(abs(tot_pc_mat[1, ] - tot_pc_mat[tpm, ]))
+    test_comp_2 <- sum(abs(tot_pc_mat[1, ] + tot_pc_mat[tpm, ]))
+    if(test_comp_2 < test_comp_1){
+      tot_pc_mat[tpm, ] <- tot_pc_mat[tpm, ] * -1
+    }
+  }
+
+
+mean_pc_val <- apply(tot_pc_mat, 2, mean)
+
+tot_pc_dif_sq <- matrix(NA, ncol = ncol(tot_pc_mat), nrow = nrow(tot_pc_mat))
+for(ptds in seq(nrow(tot_pc_dif_sq))){
+  tmp_dif_sq <- (tot_pc_mat[ptds, ] - mean_pc_val)^2
+  tot_pc_dif_sq[ptds, ] <- tmp_dif_sq
+}
+
+
+mean_pc_dif <- apply(tot_pc_dif_sq, 1, mean)
+
+tot_mean_variance <- mean(mean_pc_dif)
+# this is the mean variance for signal
+# [1] 0.0002419491
+
+tot_pc_mat <- matrix(NA, ncol = ncol(geno_mat_1_filt), 
+  nrow = nrow(tmp_fn_ew))
+
+
+
+
   if(vf == 1){
     tot_ew <- tmp_fn_ew
   } else{

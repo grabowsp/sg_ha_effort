@@ -1,11 +1,9 @@
 # Workflow
-# 0) Choose which samples to omit
-# A) Load file names for sub-vcf
-# 1) Load first sub-vcf
-# 2) Process genotypes
-# 3) Select windows for sub-vcf
-# 4) For all but final sub-vcf, remove final window to use with next vcf
-# 4) Select 
+# Select desired number of SNPs
+# Check bp windows by 10 kb, then kb
+# Find indices per SNP
+# Calculate windows with desired SNPs
+# Find window size with highest number of windows
 
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
@@ -209,13 +207,17 @@ vcf_files <- system(sys_com, intern = T)
 
 #vcf_in <- vcf_files[1]
 
-bp_win_size <- 1e5
-snp_win_size <- 1000
-test_k <- 2
-keep_wind_start_pos <- c()
-keep_snp_pos <- c()
+# Choose best window size
 
-# vf <- 2
+snp_win_size <- 1000
+wind_interval <- 1e4
+max_wind_size <- 1e6
+test_window_sizes <- seq(from = wind_interval, to = max_wind_size,
+  by = wind_interval)
+
+# vf <- 1
+
+window_test_list <- list()
 
 for(vf in seq(length(vcf_files))){
   print(paste('vcf subfile ', vf, sep = ''))
@@ -230,279 +232,89 @@ for(vf in seq(length(vcf_files))){
   invar_loci <- which(genomat_ngenos == 1)
   geno_mat_1_filt <- geno_mat_1[-invar_loci, ]
   vcf_1_filt <- vcf[-invar_loci, ]
-  if(vf != 1){
-    if(length(remain_inds) > 0){
-      geno_mat_1_filt <- rbind(remain_mat, geno_mat_1_filt)
-      vcf_1_filt <- rbind(remain_vcf, vcf_1_filt)
-    }
+  #### Look at the bp sizes for the desired number of SNPs
+  n_good_vec <- c()
+  tot_pos_wind_vec <- c()
+  for(i in test_window_sizes){
+    test_wind_snps <- get_window_inds(vcf = vcf_1_filt, 
+      min_pos = min(vcf_1_filt$POS), max_pos = max(vcf_1_filt$POS), 
+      bp_win_size = i)
+    n_good_winds <- length(which(unlist(
+      lapply(test_wind_snps[[2]], length)) >= snp_win_size))
+    n_good_vec <- c(n_good_vec, n_good_winds)
+    tot_pos_wind_vec <- c(tot_pos_wind_vec, length(test_wind_snps[[2]]))
   }
-  #####
-  # Select windows to keep for analysis
-  #min_pos <- min(vcf_filt$POS)
-  if(vf == 1){
-    min_pos <- 1
-  } else{
-    min_pos <- next_min_pos
-  }
-  max_pos <- max(vcf_1_filt$POS)
+  max_good_wind_size <- test_window_sizes[which.max(n_good_vec)]
+  good_wind_n <- max(n_good_vec)
+  per_max_good_wind <- good_wind_n/tot_pos_wind_vec[which.max(n_good_vec)]
+  window_test_list[[vf]] <- list()
+  window_test_list[[vf]][['best_window']] <- max_good_wind_size
+  window_test_list[[vf]][['n_good_windows']] <- good_wind_n
+  window_test_list[[vf]][['per_good_windows']] <- per_max_good_wind
+}
+
+
+mean_best_window <- mean(unlist(
+  lapply(window_test_list, function(x) x[['best_window']])))
+# 74545.45
+
+median_best_window <- median(unlist(
+  lapply(window_test_list, function(x) x[['best_window']])))
+# [1] 70000
+
+median_per_good_wind <- median(unlist(
+  lapply(window_test_list, function(x) x[['per_good_windows']])))
+# 0.6
+
+# How does chosen window size fit across genome
+
+chosen_window <- median_best_window
+
+chosen_window_list <- list()
+
+for(vf in seq(length(vcf_files))){
+  print(paste('vcf subfile ', vf, sep = ''))
+  vcf_in <- vcf_files[vf]
+  vcf <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
+  colnames(vcf) <- vcf_header
   #
-  wind_list_out_1 <- get_window_inds(vcf = vcf_1_filt, min_pos = min_pos,
-    max_pos = max_pos, bp_win_size = bp_win_size)
-  # the starting position of the last window; is used for making windows
-  #   in the next sub_vcf
-  tmp_wind_start_pos <- wind_list_out_1[[1]]
-  next_min_pos <- rev(tmp_wind_start_pos)[1]
-  wind_list_1 <- wind_list_out_1[[2]]
-  #
-  # remove the last window to combine with next sub_vcf except for the last
-  #   sub_vcf
-  if(vf == length(vcf_files)){
-    wind_list <- wind_list_1
-  } else{
-    wind_list <- wind_list_1[-length(wind_list_1)]
-    tmp_wind_start_pos <- tmp_wind_start_pos[-length(tmp_wind_start_pos)]
-  }
-  ######
-  # get sub-samples indices for SNPs in windows to keep and sub-select VCF
-  #   and genotype matrix
-  good_inds_1 <- get_subsamp_window_inds(bp_window_list = wind_list,
-    snp_win_size = snp_win_size)
-  vcf_sub_filt <- vcf_1_filt[good_inds_1, ]
-  geno_mat_sub <- geno_mat_1_filt[good_inds_1, ]
-  keep_snp_pos <- c(keep_snp_pos, vcf_sub_filt$POS)
-  # get window starting positions for retained windows
-  keep_wind_start_pos <- c(keep_wind_start_pos, tmp_wind_start_pos[which(unlist(
-    lapply(wind_list, length)) >= snp_win_size)])
-  #
-  if(vf != length(vcf_files)){
-    remain_inds <- unlist(wind_list_1[length(wind_list_1)])
-    remain_vcf <- vcf_1_filt[remain_inds, ]
-    remain_mat <- geno_mat_1_filt[remain_inds, ]
-  }
-  # run eigen_windows
-  tmp_fn_ew <- eigen_window_fixNAs(test_mat = geno_mat_sub, 
-    win_size = snp_win_size, test_k = test_k, fna.verbose = T)
-  if(vf == 1){
-    tot_ew <- tmp_fn_ew
-  } else{
-    tot_ew <- rbind(tot_ew, tmp_fn_ew)
-  }
+  geno_mat_1 <- process_vcf(vcf = vcf, oct_libs = oct_libs, tet_libs = tet_libs,
+    rm_libs = remove_libs)
+  genomat_ngenos <- apply(geno_mat_1, 1,
+    function(x) length(setdiff(unique(x), NA)))
+  invar_loci <- which(genomat_ngenos == 1)
+  geno_mat_1_filt <- geno_mat_1[-invar_loci, ]
+  vcf_1_filt <- vcf[-invar_loci, ]
+  #### Look at the bp sizes for the desired number of SNPs
+
+  test_wind_snps <- get_window_inds(vcf = vcf_1_filt,
+    min_pos = min(vcf_1_filt$POS), max_pos = max(vcf_1_filt$POS),
+    bp_win_size = chosen_window)
+  n_good_winds <- length(which(unlist(
+    lapply(test_wind_snps[[2]], length)) >= snp_win_size))
+  per_good_winds <- n_good_winds/length(test_wind_snps[[2]])
+
+  chosen_window_list[[vf]] <- list()
+  chosen_window_list[[vf]][['n_good_windows']] <- n_good_winds
+  chosen_window_list[[vf]][['per_good_windows']] <- per_good_winds
 }
 
-attr(tot_ew, 'npc') <- test_k
-attr(tot_ew, 'w') <- 1
+chosen_good_window_vec <- unlist(lapply(chosen_window_list, 
+  function(x) x[['n_good_windows']]))
+total_good_windows <- sum(chosen_good_window_vec)
+# 403
 
-tot_dist <- pc_dist(tot_ew)
-tot_cmd <- cmdscale(tot_dist, k = 100)
+per_good_window_vec <- unlist(lapply(chosen_window_list,
+  function(x) x[['per_good_windows']]))
 
-dist_tot_var <- sum(apply(tot_cmd, 2, var))
-dist_per_var <- (apply(tot_cmd, 2, var)/dist_tot_var)*100
+tot_window_vec <- chosen_good_window_vec/per_good_window_vec
 
-cmd_df <- data.frame(tot_cmd, stringsAsFactors = F)
-colnames(cmd_df) <- paste('PCo_', seq(ncol(cmd_df)), sep = '')
+total_potential_windows <- sum(tot_window_vec)
+#814
 
-library(ggplot2)
+total_percent_good_windows <- total_good_windows/total_potential_windows
+# 0.495086
 
-gg_c1 <- ggplot(cmd_df, aes(x = PCo_1, y = PCo_2)) +
-  geom_point() +
-  ggtitle('Chr01K expand_samps local PCA\n100kb, 1k SNP windows')
+# When using 70k bp windows, only include 50% of the windows across Chr01K
 
-cmd_pdf_out_file <- paste(data_dir, 'localPCA_Chr01K_test1.pdf', sep = '')
-
-pdf(cmd_pdf_out_file, width = 7, height = 7)
-gg_c1
-dev.off()
-
-
-
-
-
-
-#####################
-
-
-
-# NEXT - calculate distances
-
-test_res <- tot_ew
-
-attr(test_res, 'npc') <- 2
-attr(test_res, 'w') <- 1
-
-#tot_dist <- pc_dist(tot_ew)
-tot_dist <- pc_dist(test_res)
-
-tmp_cmd <- cmdscale(tmp_dist, k = 100)
-
-library(ggplot2)
-
-gg_c1 <- ggplot()
-
-
-#############################
-
-
-
-
-
-
-
-
-
-vcf <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
-colnames(vcf) <- vcf_header
-
-geno_mat_1 <- process_vcf(vcf = vcf, oct_libs = oct_libs, tet_libs = tet_libs, 
-  rm_libs = remove_libs)
-
-genomat_ngenos <- apply(geno_mat_1, 1, 
-  function(x) length(setdiff(unique(x), NA)))
-
-invar_loci <- which(genomat_ngenos == 1)
-
-geno_mat_1_filt <- geno_mat_1[-invar_loci, ]
-
-vcf_1_filt <- vcf[-invar_loci, ]
-
-
-
-
-
-###
-
-# Select SNPs to use with bp-based windows
-#  window must have minimum number of SNPs
-#  subsample SNPs so each window has same number of SNPs
-# - This approach generates the matrix in the correct form to use
-#     the standard eigen_windows() function
-
-bp_win_size <- 1e5
-snp_win_size <- 1000
-
-#min_pos <- min(vcf_filt$POS)
-min_pos <- 1
-max_pos <- max(vcf_1_filt$POS)
-
-
-
-wind_list_out_1 <- get_window_inds(vcf = vcf_1_filt, min_pos = min_pos, 
-  max_pos = max_pos, bp_win_size = bp_win_size)
-
-next_min_pos <- wind_list_out_1[[1]]
-
-wind_list_1 <- wind_list_out_1[[2]]
-
-wind_list <- wind_list_1[-length(wind_list_1)]
-
-good_inds_1 <- get_subsamp_window_inds(bp_window_list = wind_list, 
-  snp_win_size = snp_win_size)
-
-vcf_sub_filt <- vcf_1_filt[good_inds_1, ]
-
-geno_mat_sub <- geno_mat_1_filt[good_inds_1, ]
-
-remain_inds <- unlist(wind_list_1[length(wind_list_1)])
-remain_vcf <- vcf_1_filt[remain_inds, ]
-remain_mat <- geno_mat_1_filt[remain_inds, ]
-
-# run eigen_windows here
-
-# Process remaining vcfs next
-
-for(vf in c(2:(length(vcf_files)-1))){
-  print(vf)
-}
-
-
-
-################
-
-# Run eigen_windows
-#  for each window with NA's
-#    select overrepresented samples with NA's
-#    substitute half of NA's with rowMean for the sample at that SNP
-#    rerun eigen_windows
-#    repeat if still have windows with NA's
-
-
-win_size <- snp_win_size
-test_mat <- geno_mat_sub
-test_k <- 2
-
-#############
-
-# NEXT - calculate distances
-
-tmp_dist <- pc_dist(tmp_ew)
-tmp_cmd <- cmdscale(tmp_dist, k = 100)
-
-
-#####################
-# Generate bp-length-based windows
-
-vcf_filt <- vcf[-invar_loci, ]
-
-min_pos <- min(vcf_filt$POS)
-max_pos <- max(vcf_filt$POS)
-bp_win_size <- 1e4
-snp_win_size <- 100
-
-bp_start_pos <- seq(min_pos, max_pos, by = bp_win_size)
-bp_end_pos <- c((bp_start_pos[-1] - 1), max_pos)
-
-bp_window_list <- list()
-
-for(i in seq(length(bp_start_pos))){
-  tmp_inds <- which(vcf_filt$POS >= bp_start_pos[i] & 
-    vcf_filt$POS < bp_end_pos[i])
-  bp_window_list[[i]] <- tmp_inds
-}
-
-nsnps_per_wind <- unlist(lapply(bp_window_list, length))
-
-bad_windows <- which(nsnps_per_wind < 50)
-
-good_windows <- which(nsnps_per_wind >= snp_win_size)
-
-bp_sub_window_list <- list()
-
-for(j in seq(length(good_windows))){
-  tmp_wind_inds <- bp_window_list[[good_windows[j]]]
-  sub_inds <- sort(sample(tmp_wind_inds, size = snp_win_size))
-  bp_sub_window_list[[j]] <- sub_inds
-}
-
-good_sub_snp_inds <- unlist(bp_sub_window_list)
-
-vcf_filt_2 <- vcf_filt[good_sub_snp_inds, ]
-
-geno_mat_sub <- geno_mat_filt[good_sub_snp_inds, ]
-
-sub_ew <- eigen_windows(data = geno_mat_sub, k = 2, win = snp_win_size)
-prob_windows <- which(is.na(sub_ew[,1]))
-
-
-
-remove_snps <- unlist(bp_window_list[bad_windows])
-
-summary(unlist(lapply(bp_window_list[-bad_windows], length)))
-
-good_snp_inds <- unlist(bp_window_list[good_windows])
-
-geno_mat_filt_2 <- geno_mat_filt[good_snp_inds, ]
-
-bp_window_vec <- nsnps_per_wind[-bad_windows]
-
-tmp_bp_ew <- eigen_windows(data = test_mat, k = test_k, 
-  do.windows = bp_window_vec)
-
-get_bp_window = function(geno_mat = geno_mat_filt_2, 
-    window_snp_ind_list = bp_window_list, window_ind){
-  window_snp_inds <- window_snp_ind_list[[window_ind]]
-  out_mat <- geno_mat[window_snp_inds, ]
-  return(out_mat)
-}
-
-tmp_bp_ew <- eigen_windows(data = get_bp_window, k = test_k,  
-  do.windows = good_windows)
 
