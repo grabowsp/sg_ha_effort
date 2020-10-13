@@ -78,7 +78,7 @@ chosen_window <- bp_window
 ### SET OUTPUTS ###
 
 wind_info_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', 
-  SNP_window, 'SNP_', bp_window, 'bp_windows_info.txt', sep = '')
+  snp_win_size, 'SNP_', bp_window, 'bp_windows_info.txt', sep = '')
 
 #######
 #############
