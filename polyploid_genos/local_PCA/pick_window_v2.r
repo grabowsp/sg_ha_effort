@@ -51,19 +51,39 @@ stand_input_file <- args[5]
 # stand_input_file <- paste(repo_base_dir, 'sg_ha_effort/polyploid_genos/local_PCA/standard_input_files.r', sep = '')
 source(stand_input_file)
 
-tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
+#tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
 tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
   stringsAsFactors = F)[,1])
 tet_libs <- intersect(tet_libs_0, vcf_header)
 
-oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
+#oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
 oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
   stringsAsFactors = F)[,1])
 oct_libs <- intersect(oct_libs_0, vcf_header)
 
-remove_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/local_pca_remove_samps_09152020.txt'
+#remove_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/local_pca_remove_samps_09152020.txt'
 remove_libs <- as.vector(read.table(remove_lib_file, header = F,
   stringsAsFactors = F)[,1])
+
+### SET VARIABLES ###
+
+# set the interval of SNP windows to test
+# can make these adjustable if need be
+min_SNP_win_in <- 100
+max_SNP_win_in <- 1000
+snp_wind_interval <- 100
+snp_win_size_vec <- seq(min_SNP_win_in, max_SNP_win_in, by = snp_wind_interval)
+
+# set the interval of bp windows to test
+wind_interval <- 1e4
+max_wind_size <- 3e5
+test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
+  by = wind_interval)
+
+### SET OUTPUTS ###
+
+wind_test_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', 
+  'windowtests.txt', sep = '')
 
 #######
 #############
@@ -75,13 +95,13 @@ vcf_files <- system(sys_com, intern = T)
 
 # Choose best window size
 
-snp_win_size <- 200
-snp_win_size_vec <- seq(100,1000, by = 100)
+#snp_win_size <- 200
+#snp_win_size_vec <- seq(100,1000, by = 100)
 
-wind_interval <- 1e4
-max_wind_size <- 3e5
-test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
-  by = wind_interval)
+#wind_interval <- 1e4
+#max_wind_size <- 3e5
+#test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
+#  by = wind_interval)
 
 # vf <- 1
 
@@ -137,6 +157,7 @@ for(vf in seq(length(vcf_files))){
   window_test_list[[vf]][['per_good_windows_vec']] <- per_max_good_wind_vec
 }
 
+
 best_window_mat <- matrix(data = unlist(
   lapply(window_test_list, function(x) x[['best_window_vec']])), 
   nrow = length(window_test_list), byrow = T)
@@ -177,8 +198,14 @@ median_per_good_window <- apply(per_good_window_mat, 2, median)
 # 900_SNPs 1000_SNPs 
 #0.6027397 0.6000000
 
+window_df <- data.frame(snp_window = names(combo_n_windows), 
+  n_windows = combo_n_windows, mean_best_window, median_best_window, 
+  median_percent_good_window = median_per_good_window)
 
+write.table(window_df, wind_test_out, quote = F, sep = '\t', row.names = F,
+  col.names = T)
 
+quit(save = 'no')
 
 
 # How does chosen window size fit across genome
