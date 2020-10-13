@@ -36,12 +36,20 @@ CHR_NAME=Chr01K
 HEAD_SHORT=CDS.expandv2.vcf.header.txt
 INPUT_FILES=$REPO_DIR'sg_ha_effort/polyploid_genos/local_PCA/standard_input_files.r'
 
-R_SCRIPT_NAME=$REPO_DIR'sg_ha_effort/polyploid_genos/local_PCA/pick_window_v2.r '
+Rscript R_SCRIPT_NAME=$REPO_DIR'sg_ha_effort/polyploid_genos/local_PCA/pick_window_v2.r '
 
 cd $DATA_DIR
 
 $R_SCRIPT_NAME $REPO_DIR $DATA_DIR $CHR_NAME $HEAD_SHORT $INPUT_FILES
-
-
-
 ```
+
+## Get info about window choice
+* R script = `~/sg_ha_effort/polyploid_genos/local_PCA/get_window_info.r`
+* test shell script
+  * `/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/localPCA_windowinfo_test_1.sh`
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/
+sbatch localPCA_windowinfo_test_1.sh
+```
+
+

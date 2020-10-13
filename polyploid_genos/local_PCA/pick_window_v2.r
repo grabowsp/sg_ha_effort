@@ -3,7 +3,7 @@
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
 
-args = commandArgs(trailingOnly=True)
+args <- commandArgs(trailingOnly=T)
 #rundir_args <- commandArgs(trailingOnly = F)
 
 library(data.table)

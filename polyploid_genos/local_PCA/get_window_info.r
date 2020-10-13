@@ -4,7 +4,7 @@
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
 
-args = commandArgs(trailingOnly=True)
+args = commandArgs(trailingOnly=T)
 #rundir_args <- commandArgs(trailingOnly = F)
 
 library(data.table)
@@ -68,11 +68,12 @@ remove_libs <- as.vector(read.table(remove_lib_file, header = F,
 
 ### SET VARIABLES ###
 
-SNP_window <- as.numeric(args[6])
-#SNP_window <- 200
+snp_win_size <- as.numeric(args[6])
+#snp_win_size <- 200
 
 bp_window <- as.numeric(args[]7)
 bp_window <- 10000
+chosen_window <- bp_window
 
 ### SET OUTPUTS ###
 
@@ -84,6 +85,82 @@ wind_info_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.',
 
 sys_com <- paste('ls ', vcf_pre, '*', sep = '')
 vcf_files <- system(sys_com, intern = T)
+
+chosen_window_list <- list()
+
+for(vf in seq(length(vcf_files))){
+  print(paste('vcf subfile ', vf, sep = ''))
+  vcf_in <- vcf_files[vf]
+  vcf <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
+  colnames(vcf) <- vcf_header
+  #
+  geno_mat_1 <- process_vcf(vcf = vcf, oct_libs = oct_libs, tet_libs = tet_libs,
+    rm_libs = remove_libs)
+  genomat_ngenos <- apply(geno_mat_1, 1,
+    function(x) length(setdiff(unique(x), NA)))
+  invar_loci <- which(genomat_ngenos == 1)
+  geno_mat_1_filt <- geno_mat_1[-invar_loci, ]
+  vcf_1_filt <- vcf[-invar_loci, ]
+  #### Look at the bp sizes for the desired number of SNPs
+
+  test_wind_snps <- get_window_inds(vcf = vcf_1_filt,
+    min_pos = min(vcf_1_filt$POS), max_pos = max(vcf_1_filt$POS),
+    bp_win_size = chosen_window)
+  n_good_winds <- length(which(unlist(
+    lapply(test_wind_snps[[2]], length)) >= snp_win_size))
+  per_good_winds <- n_good_winds/length(test_wind_snps[[2]])
+
+  chosen_window_list[[vf]] <- list()
+  chosen_window_list[[vf]][['n_good_windows']] <- n_good_winds
+  chosen_window_list[[vf]][['per_good_windows']] <- per_good_winds
+}
+
+chosen_good_window_vec <- unlist(lapply(chosen_window_list, 
+  function(x) x[['n_good_windows']]))
+total_good_windows <- sum(chosen_good_window_vec)
+# for 1000 SNPs
+# 403
+
+per_good_window_vec <- unlist(lapply(chosen_window_list,
+  function(x) x[['per_good_windows']]))
+
+tot_window_vec <- chosen_good_window_vec/per_good_window_vec
+
+total_potential_windows <- sum(tot_window_vec)
+# For 1000 SNPs
+#814
+
+total_percent_good_windows <- total_good_windows/total_potential_windows
+# For 1000 SNPs
+# 0.495086
+# When using 70k bp windows and 1000 SNPs, only include 50% of the windows 
+#   across Chr01K
+
+wind_info_df <- data.frame(chr = chr_name, SNP_win_size = snp_win_size, 
+  bp_win_size = bp_window, n_good_windows = total_good_windows, 
+  n_tot_windows = total_potential_windows, 
+  per_good_windows = total_percent_good_windows, stringsAsFactors = F)
+
+write.table(wind_info_df, wind_info_out, quote = F, sep = '\t', row.names = F,
+  col.names = T)
+
+quit(save = 'no')
+
+
+out_text <- paste('For windows using ', snp_win_size, ' and ', bp_window, 
+  'windows on ', chr_name, ', will include ', total_good_windows, ' of ',
+  total_potential_windows, ' (', total_percent_good_windows, 
+  '%) are included', sep = '')
+
+
+write.table(out_text, wind_info_out, )
+
+
+
+
+
+
+
 
 window_test_list <- list()
 
