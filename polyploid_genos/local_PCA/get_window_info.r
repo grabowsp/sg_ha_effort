@@ -71,7 +71,7 @@ remove_libs <- as.vector(read.table(remove_lib_file, header = F,
 snp_win_size <- as.numeric(args[6])
 #snp_win_size <- 200
 
-bp_window <- as.numeric(args[]7)
+bp_window <- as.numeric(args[7])
 bp_window <- 10000
 chosen_window <- bp_window
 
