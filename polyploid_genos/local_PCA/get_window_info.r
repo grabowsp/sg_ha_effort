@@ -1,4 +1,5 @@
-# Script to find the bp window size that best fits the desired SNP window size
+# Script to get info about the number and percentage of windows included
+#  in a bp- and SNP-window combination
 
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
@@ -67,43 +68,22 @@ remove_libs <- as.vector(read.table(remove_lib_file, header = F,
 
 ### SET VARIABLES ###
 
-# set the interval of SNP windows to test
-# can make these adjustable if need be
-min_SNP_win_in <- 100
-max_SNP_win_in <- 1000
-snp_wind_interval <- 100
-snp_win_size_vec <- seq(min_SNP_win_in, max_SNP_win_in, by = snp_wind_interval)
+SNP_window <- as.numeric(args[6])
+#SNP_window <- 200
 
-# set the interval of bp windows to test
-wind_interval <- 1e4
-max_wind_size <- 3e5
-test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
-  by = wind_interval)
+bp_window <- as.numeric(args[]7)
+bp_window <- 10000
 
 ### SET OUTPUTS ###
 
-wind_test_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', 
-  'windowtests.txt', sep = '')
+wind_info_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', 
+  SNP_window, 'SNP_', bp_window, 'bp_windows_info.txt', sep = '')
 
 #######
 #############
 
 sys_com <- paste('ls ', vcf_pre, '*', sep = '')
 vcf_files <- system(sys_com, intern = T)
-
-#vcf_in <- vcf_files[1]
-
-# Choose best window size
-
-#snp_win_size <- 200
-#snp_win_size_vec <- seq(100,1000, by = 100)
-
-#wind_interval <- 1e4
-#max_wind_size <- 3e5
-#test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
-#  by = wind_interval)
-
-# vf <- 1
 
 window_test_list <- list()
 
