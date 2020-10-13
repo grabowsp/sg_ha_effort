@@ -1,54 +1,98 @@
-# Workflow
-# Select desired number of SNPs
-# Check bp windows by 10 kb, then kb
-# Find indices per SNP
-# Calculate windows with desired SNPs
-# Find window size with highest number of windows
+# Utility for finding the best bp window size so that there are the most
+#   windows that contain the requested number of SNPs
+#  Utility test multiple SNP number posibilities
 
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
 
+args = commandArgs(trailingOnly=True)
+rundir_args <- commandArgs(trailingOnly = F)
+
+file.arg.name <- '--file='
+script.name <- sub(file.arg.name, '',
+  rundir_args[grep(file.arg.name, rundir_args)])
+script.basename <- dirname(script.name)
+
+### LOAD PACKAGES AND FUNCTIONS ###
+
+locpca_func_file <- file.path(script.basename, 'localPCA_functions.r')
+source(locpca_func_file)
+
 library(data.table)
 library(lostruct)
-
-repo_base_dir <- '/global/homes/g/grabowsp/tools/'
-locpca_func_file_short <- 'sg_ha_effort/polyploid_genos/local_PCA/localPCA_functions.r'
-locpca_func_file <- paste(repo_base_dir, locpca_func_file_short, sep = '')
-source(locpca_func_file)
 
 ### LOAD DATA ###
 
 # VCF info
-#data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/'
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+#data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+data_dir <- args[1]
 
-chr_name <- 'Chr01K'
+if(rev(unlist(strsplit(data_dir, split = '')))[1] != '/'){
+  data_dir <- paste(data_dir, '/', sep = '')
+}
 
-vcf_inbetween <- 'polyploid.CDS.expandv2'
+vcf_pre_short <- args[2]
+#vcf_pre_short <- 'Chr01K.polyploid.CDS.expandv2.vcf_'
+vcf_pre <- paste(data_dir, vcf_pre_short, sep = '')
 
-vcf_pre <- paste(data_dir, paste(chr_name, vcf_inbetween, 'vcf_', sep = '.'), 
-  sep = '')
+#chr_name <- 'Chr01K'
+#vcf_inbetween <- 'polyploid.CDS.expandv2'
+#vcf_pre <- paste(data_dir, paste(chr_name, vcf_inbetween, 'vcf_', sep = '.'), 
+#  sep = '')
 
-head_in_short <- 'CDS.expandv2.vcf.header.txt'
+head_in_short <- args[3]
+#head_in_short <- 'CDS.expandv2.vcf.header.txt'
 vcf_header_file <- paste(data_dir, head_in_short, sep = '')
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
   sep = '\t', header = F, comment.char = '@'))
 
+# Additional infomation
 # Library info
 
-tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
+# file containing the file names for additional inputs like 4X and 8X libraries
+extra_input_files <- '/home/grabowsky/tools/workflows/sg_ha_effort/polyploid_genos/local_PCA/standard_input_files.r'
+source(extra_input_files)
+
+# tet_lib_file, oct_lib_file, and remove_lib_file should all be 
+#tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
 tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
   stringsAsFactors = F)[,1])
 tet_libs <- intersect(tet_libs_0, vcf_header)
 
-oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
+#oct_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/octoploid_lib_names_May2020.txt'
 oct_libs_0 <- as.vector(read.table(oct_lib_file, header = F,
   stringsAsFactors = F)[,1])
 oct_libs <- intersect(oct_libs_0, vcf_header)
 
-remove_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/local_pca_remove_samps_09152020.txt'
+#remove_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/local_pca_remove_samps_09152020.txt'
 remove_libs <- as.vector(read.table(remove_lib_file, header = F,
   stringsAsFactors = F)[,1])
+
+### SET VARIABLES ###
+
+# Set SNP windows to test
+min_snp_window <- as.numeric(args[4])
+#min_snp_window <- 100
+max_snp_window <- as.numeric(args[5])
+#max_snp_window <- 1000
+snp_window_interval <- as.numeric(args[6])
+#snp_window_interval <- 100
+
+snp_win_size_vec <- seq(from = min_snp_window, to = max_snp_window, 
+  by = snp_window_interval)
+
+# Set bp windows to test
+min_bp_window <- as.numeric(args[7])
+#min_bp_window <- 1e4
+max_bp_window <- as.numeric(args[8])
+#max_bp_window <- 3e5
+bp_window_interval <- as.numeric(args[9])
+#bp_window_interval <- 1e4
+
+test_bp_window_sizes <- seq(from = min_bp_window, to = max_bp_window,
+  by = bp_window_interval) 
+
+### CONTINUE FROM HERE ###
 
 #######
 #############

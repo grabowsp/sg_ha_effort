@@ -1,17 +1,20 @@
-# Workflow
-# Select desired number of SNPs
-# Check bp windows by 10 kb, then kb
-# Find indices per SNP
-# Calculate windows with desired SNPs
-# Find window size with highest number of windows
+# Script to find the bp window size that best fits the desired SNP window size
 
 # module load python/3.7-anaconda-2019.07
 # source activate local_PCA
 
+args = commandArgs(trailingOnly=True)
+#rundir_args <- commandArgs(trailingOnly = F)
+
 library(data.table)
 library(lostruct)
 
-repo_base_dir <- '/global/homes/g/grabowsp/tools/'
+repo_base_dir <- args[1]
+# repo_base_dir <- '/global/homes/g/grabowsp/tools/'
+if(rev(unlist(strsplit(repo_base_dir, split = '')))[1] != '/'){
+  repo_base_dir <- paste(repo_base_dir, '/', sep = '')
+}
+
 locpca_func_file_short <- 'sg_ha_effort/polyploid_genos/local_PCA/localPCA_functions.r'
 locpca_func_file <- paste(repo_base_dir, locpca_func_file_short, sep = '')
 source(locpca_func_file)
@@ -19,22 +22,34 @@ source(locpca_func_file)
 ### LOAD DATA ###
 
 # VCF info
-#data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_geo_samps/'
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+data_dir <- args[2]
+# data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+if(rev(unlist(strsplit(data_dir, split = '')))[1] != '/'){
+  data_dir <- paste(data_dir, '/', sep = '')
+}
 
-chr_name <- 'Chr01K'
+chr_name <- args[3]
+# chr_name <- 'Chr01K'
 
-vcf_inbetween <- 'polyploid.CDS.expandv2'
+# the text inbetween the chromosome name and the end of the name 
+vcf_inbetween <- args[4]
+#vcf_inbetween <- 'polyploid.CDS.expandv2'
 
 vcf_pre <- paste(data_dir, paste(chr_name, vcf_inbetween, 'vcf_', sep = '.'), 
   sep = '')
 
-head_in_short <- 'CDS.expandv2.vcf.header.txt'
+head_in_short <- args[4]
+#head_in_short <- 'CDS.expandv2.vcf.header.txt'
 vcf_header_file <- paste(data_dir, head_in_short, sep = '')
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
   sep = '\t', header = F, comment.char = '@'))
 
 # Library info
+
+# File that includes the file names of 4X, 8X, and bad library names
+stand_input_file <- args[5]
+# stand_input_file <- paste(repo_base_dir, 'sg_ha_effort/polyploid_genos/local_PCA/standard_input_files.r', sep = '')
+source(stand_input_file)
 
 tet_lib_file <- '/global/cscratch1/sd/grabowsp/sg_ploidy/tetraploid_lib_names_May2020.txt'
 tet_libs_0 <- as.vector(read.table(tet_lib_file, header = F,
