@@ -38,7 +38,7 @@ vcf_inbetween <- args[4]
 vcf_pre <- paste(data_dir, paste(chr_name, vcf_inbetween, 'vcf_', sep = '.'), 
   sep = '')
 
-head_in_short <- args[4]
+head_in_short <- args[5]
 #head_in_short <- 'CDS.expandv2.vcf.header.txt'
 vcf_header_file <- paste(data_dir, head_in_short, sep = '')
 vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
@@ -47,7 +47,7 @@ vcf_header <- gsub('#', '', read.table(vcf_header_file, stringsAsFactors = F,
 # Library info
 
 # File that includes the file names of 4X, 8X, and bad library names
-stand_input_file <- args[5]
+stand_input_file <- args[6]
 # stand_input_file <- paste(repo_base_dir, 'sg_ha_effort/polyploid_genos/local_PCA/standard_input_files.r', sep = '')
 source(stand_input_file)
 
