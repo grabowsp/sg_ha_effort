@@ -174,31 +174,19 @@ per_good_window_mat <-  matrix(data = unlist(
 colnames(per_good_window_mat) <- names(
   window_test_list[[1]][['best_window_vec']])
 
+# number of good windows summed across all VCFs
 combo_n_windows <- apply(n_window_mat, 2, sum)
-#100_SNPs  200_SNPs  300_SNPs  400_SNPs  500_SNPs  600_SNPs  700_SNPs  800_SNPs 
-#   2520      1743      1179       924       753       648       572       505 
-# 900_SNPs 1000_SNPs 
-#      456       427 
 
+# mean, across VCFs, of bp window size that produces the most windows
 mean_best_window <- apply(best_window_mat, 2, mean)
-#100_SNPs  200_SNPs  300_SNPs  400_SNPs  500_SNPs  600_SNPs  700_SNPs  800_SNPs 
-#10000.00  10000.00  18181.82  26363.64  34545.45  46363.64  54545.45  57272.73 
-# 900_SNPs 1000_SNPs 
-# 70000.00  74545.45 
 
+# median, across VCFs, of bp window size that produces the most windows
 median_best_window <- apply(best_window_mat, 2, median)
-#100_SNPs  200_SNPs  300_SNPs  400_SNPs  500_SNPs  600_SNPs  700_SNPs  800_SNPs 
-#   10000     10000     20000     20000     30000     40000     50000     50000 
-# 900_SNPs 1000_SNPs 
-#    70000     70000 
 
+# median, across VCFs, of percent good windows in best bp window size
 median_per_good_window <- apply(per_good_window_mat, 2, median)
-#100_SNPs  200_SNPs  300_SNPs  400_SNPs  500_SNPs  600_SNPs  700_SNPs  800_SNPs 
-#0.555294 0.3727679 0.4042553 0.4522613 0.4733333 0.5752212 0.6052632 0.5666667 
-# 900_SNPs 1000_SNPs 
-#0.6027397 0.6000000
 
-window_df <- data.frame(snp_window = names(combo_n_windows), 
+window_df <- data.frame(chr = chr_name, snp_window = names(combo_n_windows), 
   n_windows = combo_n_windows, mean_best_window, median_best_window, 
   median_percent_good_window = median_per_good_window)
 
@@ -206,60 +194,5 @@ write.table(window_df, wind_test_out, quote = F, sep = '\t', row.names = F,
   col.names = T)
 
 quit(save = 'no')
-
-
-# How does chosen window size fit across genome
-
-chosen_window <- median_best_window
-
-chosen_window_list <- list()
-
-for(vf in seq(length(vcf_files))){
-  print(paste('vcf subfile ', vf, sep = ''))
-  vcf_in <- vcf_files[vf]
-  vcf <- read.table(vcf_in, header = F, stringsAsFactors = F, sep = '\t')
-  colnames(vcf) <- vcf_header
-  #
-  geno_mat_1 <- process_vcf(vcf = vcf, oct_libs = oct_libs, tet_libs = tet_libs,
-    rm_libs = remove_libs)
-  genomat_ngenos <- apply(geno_mat_1, 1,
-    function(x) length(setdiff(unique(x), NA)))
-  invar_loci <- which(genomat_ngenos == 1)
-  geno_mat_1_filt <- geno_mat_1[-invar_loci, ]
-  vcf_1_filt <- vcf[-invar_loci, ]
-  #### Look at the bp sizes for the desired number of SNPs
-
-  test_wind_snps <- get_window_inds(vcf = vcf_1_filt,
-    min_pos = min(vcf_1_filt$POS), max_pos = max(vcf_1_filt$POS),
-    bp_win_size = chosen_window)
-  n_good_winds <- length(which(unlist(
-    lapply(test_wind_snps[[2]], length)) >= snp_win_size))
-  per_good_winds <- n_good_winds/length(test_wind_snps[[2]])
-
-  chosen_window_list[[vf]] <- list()
-  chosen_window_list[[vf]][['n_good_windows']] <- n_good_winds
-  chosen_window_list[[vf]][['per_good_windows']] <- per_good_winds
-}
-
-chosen_good_window_vec <- unlist(lapply(chosen_window_list, 
-  function(x) x[['n_good_windows']]))
-total_good_windows <- sum(chosen_good_window_vec)
-# for 1000 SNPs
-# 403
-
-per_good_window_vec <- unlist(lapply(chosen_window_list,
-  function(x) x[['per_good_windows']]))
-
-tot_window_vec <- chosen_good_window_vec/per_good_window_vec
-
-total_potential_windows <- sum(tot_window_vec)
-# For 1000 SNPs
-#814
-
-total_percent_good_windows <- total_good_windows/total_potential_windows
-# For 1000 SNPs
-# 0.495086
-# When using 70k bp windows and 1000 SNPs, only include 50% of the windows 
-#   across Chr01K
 
 

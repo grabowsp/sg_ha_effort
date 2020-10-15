@@ -10,6 +10,62 @@
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
 sbatch localPCA_window_test_1.sh
 ```
+### Submit test for rest of chromosomes
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
+sbatch localPCA_window_test_2.sh
+
+```
+### Compile output
+* This example is for old version of output that doesn't include Chr
+```
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+
+sys_com <- paste('ls ', data_dir, '*windowtests.txt', sep = '')
+
+in_files <- system(sys_com, intern = T)
+
+for(infi in in_files){
+  res <- read.table(infi, header = T, sep = '\t', stringsAsFactors = F)
+  chr_name <- unlist(strsplit(sub(data_dir, '', infi), split = '.', 
+    fixed = T))[1]
+  res$chr <- chr_name
+  if(infi == in_files[1]){
+    tot_res <- res
+  } else{
+    tot_res <- rbind(tot_res, res)
+  }
+}
+
+tot_med_windows <- tapply(tot_res$median_best_window, tot_res$snp_window, 
+  median)
+
+tot_n_windows <- tapply(tot_res$n_windows, tot_res$snp_window, sum)
+
+tot_per_windows <- tapply(tot_res$median_percent_good_window, 
+  tot_res$snp_window, mean)
+
+tot_wind_df <- data.frame(SNP_window = names(tot_med_windows), 
+  best_bp_window = tot_med_windows, stringsAsFactors = F)
+
+tot_wind_df$n_good_windows <- tot_n_windows[rownames(tot_wind_df)]
+
+tot_wind_df$per_good_windows <- tot_per_windows[rownames(tot_wind_df)]
+
+tot_wind_df <- tot_wind_df[ order(as.numeric(
+  sub('_SNPs', '', tot_wind_df$SNP_window))), ]
+
+out_file <- paste(data_dir, 'tot_best_bp_window_test.txt', sep = '')
+
+
+```
+
+
+
+
 ### Example of submit script
 ```
 #!/bin/bash
