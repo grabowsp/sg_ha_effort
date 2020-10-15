@@ -86,6 +86,8 @@ pcs_to_check <- seq(test_k)
 jk_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', snp_win_size,
   '_SNP.', bp_win_size, '_bp.', 'jackknifetest.txt', sep = '')
 
+ew_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', snp_win_size,
+  '_SNP.', bp_win_size, '_bp.', 'localPCA.rds', sep = '')
 
 #############
 
@@ -205,7 +207,10 @@ for(vf in seq(length(vcf_files))){
 
 # Look at multiple PCs
 
-res_mat <- data.frame(PC = pcs_to_check, tot_mean_variance = NA, 
+saveRDS(tot_ew, file = ew_out)
+
+res_mat <- data.frame(chr = chr_name, SNP_window = snp_win_size, 
+  bp_window = bp_win_size, PC = pcs_to_check, tot_mean_variance = NA, 
   noise_variance = NA, stringsAsFactors = F)
 
 # Calculate variance-signal from full eigen_windows
@@ -276,9 +281,10 @@ for(pct in pcs_to_check){
   res_mat$noise_variance[which(res_mat$PC == pct)] <- noise_variance
 }
 
+write.table(res_mat, file = jk_out, quote = F, sep = '\t', row.names = F,
+  col.names = T)
 
-
-
+quit(save = 'no')
 
 
 

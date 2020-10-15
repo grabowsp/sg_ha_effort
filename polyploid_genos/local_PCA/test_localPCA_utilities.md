@@ -17,48 +17,31 @@ sbatch localPCA_window_test_2.sh
 
 ```
 ### Compile output
-* This example is for old version of output that doesn't include Chr
+* R script
+  * `~/sg_ha_effort/polyploid_genos/local_PCA/combine_pick_window_res.r`
 ```
 module load python/3.7-anaconda-2019.07
 source activate R_analysis
 
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
 
-sys_com <- paste('ls ', data_dir, '*windowtests.txt', sep = '')
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
 
-in_files <- system(sys_com, intern = T)
+RES_SUF=polyploid.CDS.expandv2.windowtests.txt
 
-for(infi in in_files){
-  res <- read.table(infi, header = T, sep = '\t', stringsAsFactors = F)
-  chr_name <- unlist(strsplit(sub(data_dir, '', infi), split = '.', 
-    fixed = T))[1]
-  res$chr <- chr_name
-  if(infi == in_files[1]){
-    tot_res <- res
-  } else{
-    tot_res <- rbind(tot_res, res)
-  }
-}
+OUT_PRE=CDS.expandv2
 
-tot_med_windows <- tapply(tot_res$median_best_window, tot_res$snp_window, 
-  median)
+R_SCRIPT=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/local_PCA/combine_pick_window_res.r
 
-tot_n_windows <- tapply(tot_res$n_windows, tot_res$snp_window, sum)
+Rscript $R_SCRIPT $DATA_DIR $RES_SUF $OUT_PRE
 
-tot_per_windows <- tapply(tot_res$median_percent_good_window, 
-  tot_res$snp_window, mean)
+```
 
-tot_wind_df <- data.frame(SNP_window = names(tot_med_windows), 
-  best_bp_window = tot_med_windows, stringsAsFactors = F)
+### Test jackknife script
 
-tot_wind_df$n_good_windows <- tot_n_windows[rownames(tot_wind_df)]
-
-tot_wind_df$per_good_windows <- tot_per_windows[rownames(tot_wind_df)]
-
-tot_wind_df <- tot_wind_df[ order(as.numeric(
-  sub('_SNPs', '', tot_wind_df$SNP_window))), ]
-
-out_file <- paste(data_dir, 'tot_best_bp_window_test.txt', sep = '')
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
+sbatch localPCA_jack_test_1.sh 
 
 
 ```
