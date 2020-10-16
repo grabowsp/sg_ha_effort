@@ -41,7 +41,11 @@ Rscript $R_SCRIPT $DATA_DIR $RES_SUF $OUT_PRE
 
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
-sbatch localPCA_jack_test_1.sh 
+
+for tf in localPCA_jack*test.sh;
+do
+sbatch $tf;
+done
 
 
 ```

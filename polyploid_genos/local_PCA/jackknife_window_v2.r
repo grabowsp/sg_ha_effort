@@ -89,6 +89,10 @@ jk_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', snp_win_size,
 ew_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', snp_win_size,
   '_SNP.', bp_win_size, '_bp.', 'localPCA.rds', sep = '')
 
+jack_ew_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', snp_win_size,
+  '_SNP.', bp_win_size, '_bp.', 'localPCA_jackknife.rds', sep = '')
+
+
 #############
 
 sys_com <- paste('ls ', vcf_pre, '*', sep = '')
@@ -208,6 +212,7 @@ for(vf in seq(length(vcf_files))){
 # Look at multiple PCs
 
 saveRDS(tot_ew, file = ew_out)
+saveRDS(tot_jack_ew, file = jack_ew_out)
 
 res_mat <- data.frame(chr = chr_name, SNP_window = snp_win_size, 
   bp_window = bp_win_size, PC = pcs_to_check, tot_mean_variance = NA, 
@@ -247,12 +252,12 @@ for(pct in pcs_to_check){
   pc_vec_cols <- grep(pc_test_pre, colnames(tot_jack_ew[[1]]))
   #
   jack_pc_mat <- matrix(NA, nrow = length(tot_jack_ew),
-    ncol = length(pc1_vec_cols))
+    ncol = length(pc_vec_cols))
   window_se_vec <- c()
   #
   for(wn in seq(nrow(tot_jack_ew[[1]]))){
     jack_pc_mat <- matrix(NA, nrow = length(tot_jack_ew),
-      ncol = length(pc1_vec_cols))
+      ncol = length(pc_vec_cols))
     jack_pc_mat[1, ] <- tot_jack_ew[[1]][wn,pc_vec_cols]
     for(jp in c(2:nrow(jack_pc_mat))){
       tmp_eigvec <- tot_jack_ew[[jp]][wn,pc_vec_cols]
