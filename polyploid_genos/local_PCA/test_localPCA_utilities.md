@@ -52,6 +52,20 @@ done
 ### Look at jackknife output
 ```
 
+module load python/3.7-anaconda-2019.07
+source activate R_analysis
+
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
+
+DATA_DIR=/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
+
+RES_SUF=jackknifetest.txt
+
+OUT_PRE=Chr01K.CDS.expandv2
+
+R_SCRIPT=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/local_PCA/combine_jackknife_res.r
+
+Rscript $R_SCRIPT $DATA_DIR $RES_SUF $OUT_PRE
 
 
 

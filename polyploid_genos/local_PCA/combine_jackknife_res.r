@@ -51,6 +51,10 @@ tmp_res_2 <- tmp_res[order(tmp_res$PC), ]
 tmp_res_2$sig_noise_dif <- (tmp_res_2$tot_mean_variance - 
   tmp_res_2$noise_variance)
 
+tmp_res_2[, c('tot_mean_variance', 'noise_variance', 'sig_noise_dif')] <- 
+  format(tmp_res_2[, c('tot_mean_variance', 'noise_variance', 
+    'sig_noise_dif')], digits = 4, scientific = T)
+
 write.table(tmp_res_2, out_file, quote = F, sep = '\t', row.names = F,
   col.names = T)
 
