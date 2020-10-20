@@ -49,7 +49,33 @@ done
 
 
 ```
+### Look at jackknife output
+```
 
+
+
+
+
+
+
+
+module load python/3.7-anaconda-2019.07
+source activate /global/homes/g/grabowsp/.conda/envs/local_PCA
+
+data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2'
+
+data_dir <- paste(data_dir, '/', sep = '')
+
+data_suf <- 'jackknifetest.txt'
+
+sys_com <- paste('ls ', data_dir, '*', data_suf, sep = '')
+
+data_files <- system(sys_com, intern = T)
+
+tmp_data <- read.table(data_files[1], header = T, sep = '\t', 
+  stringsAsFactors = F)
+
+```
 
 
 
