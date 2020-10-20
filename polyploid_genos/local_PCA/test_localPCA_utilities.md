@@ -10,6 +10,13 @@
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
 sbatch localPCA_window_test_1.sh
 ```
+### Test for larger windows
+```
+cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
+sbatch localPCA_window_test_Chr01K_larger_windows.sh
+
+```
+
 ### Submit test for rest of chromosomes
 ```
 cd /global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2
@@ -67,27 +74,75 @@ R_SCRIPT=/global/homes/g/grabowsp/tools/sg_ha_effort/polyploid_genos/local_PCA/c
 
 Rscript $R_SCRIPT $DATA_DIR $RES_SUF $OUT_PRE
 
+```
+
+### Look at results
+```
+# module load python/3.7-anaconda-2019.07
+# source activate local_PCA
+
+library(data.table)
+library(lostruct)
+library(ggplot2)
+
+data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2/'
+
+data_file_short <- 'Chr01K.polyploid.CDS.expandv2.300_SNP.20000_bp.localPCA.rds'
+
+data_file <- paste(data_dir, data_file_short, sep = '')
 
 
+tmp_res <- readRDS(data_file)
 
+pcdist <- pc_dist(tmp_res, npc = 2)
+tot_cmd <- cmdscale(pcdist, k = 50)
+dist_tot_var <- sum(apply(tot_cmd, 2, var))
+dist_per_var <- (apply(tot_cmd, 2 , var)/dist_tot_var)*100
 
+tot_cmd_df <- data.frame(tot_cmd, stringsAsFactors = F)
+colnames(tot_cmd_df) <- paste('PCo_', seq(ncol(tot_cmd_df)), sep = '')
 
+pcs_to_keep <- c(1)
 
-module load python/3.7-anaconda-2019.07
-source activate /global/homes/g/grabowsp/.conda/envs/local_PCA
+tot_res_cols <- c()
+for(ptk in pcs_to_keep){
+  tmp_cols <- colnames(tmp_res)[grep(paste('PC_', ptk, '_', sep = ''), 
+    colnames(tmp_res))]
+  tot_res_cols <- c(tot_res_cols, tmp_cols)
+}
 
-data_dir <- '/global/cscratch1/sd/grabowsp/sg_ploidy/polyploid_vcfs/CDS_vcfs/expand_v2'
+cols_to_keep <- c('total', paste('lam_', pcs_to_keep, sep = ''), tot_res_cols)
 
-data_dir <- paste(data_dir, '/', sep = '')
+tmp_res_sub <- tmp_res[, cols_to_keep]
 
-data_suf <- 'jackknifetest.txt'
+pcdist_sub <- pc_dist(tmp_res_sub, npc = 1)
+sub_cmd <- cmdscale(pcdist_sub, k = 50)
+sub_tot_var <- sum(apply(sub_cmd, 2, var))
+sub_per_var <- (apply(sub_cmd, 2, var)/sub_tot_var)*100
 
-sys_com <- paste('ls ', data_dir, '*', data_suf, sep = '')
+sub_cmd_df <- data.frame(sub_cmd, stringsAsFactors = F)
+colnames(sub_cmd_df) <- paste('PCo_', seq(ncol(sub_cmd_df)), sep = '')
 
-data_files <- system(sys_com, intern = T)
+gg_c1 <- ggplot(tot_cmd_df, aes(x = PCo_1, y = PCo_2)) + geom_point() +
+  ggtitle('PCoA of Chr01K expand_samps local PCA\n300 SNPs, 20kb windows\nDistance using PC 1 and PC 2')
 
-tmp_data <- read.table(data_files[1], header = T, sep = '\t', 
-  stringsAsFactors = F)
+gg_sub_c1 <- ggplot(sub_cmd_df, aes(x = PCo_1, y = PCo_2)) + geom_point() +
+  ggtitle('PCoA of Chr01K expand_samps local PCA\n300 SNPs, 20kb windows\nDistance using PC 1 only')
+
+cmd_pdf_out_file_1 <- paste(data_dir, 
+  'localPCA_Chr01K_300SNPs20kb_PC1_PC2_test.pdf', sep = '')
+
+pdf(cmd_pdf_out_file_1, width = 7, height = 7)
+gg_c1
+dev.off()
+
+cmd_pdf_out_file_2 <- paste(data_dir, 
+  'localPCA_Chr01K_300SNPs20kb_PC1_only_test.pdf', sep = '')
+
+pdf(cmd_pdf_out_file_2, width = 7, height = 7)
+gg_sub_c1
+dev.off()
+
 
 ```
 

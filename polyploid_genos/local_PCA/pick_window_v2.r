@@ -67,23 +67,36 @@ remove_libs <- as.vector(read.table(remove_lib_file, header = F,
 
 ### SET VARIABLES ###
 
-# set the interval of SNP windows to test
+## set the interval of SNP windows to test
 # can make these adjustable if need be
-min_SNP_win_in <- 100
-max_SNP_win_in <- 1000
-snp_wind_interval <- 100
+min_SNP_win_in <- as.numeric(args[7])
+#min_SNP_win_in <- 100
+
+max_SNP_win_in <- as.numeric(args[8])
+#max_SNP_win_in <- 1000
+
+snp_wind_interval <- as.numeric(args[9])
+#snp_wind_interval <- 100
+
 snp_win_size_vec <- seq(min_SNP_win_in, max_SNP_win_in, by = snp_wind_interval)
 
-# set the interval of bp windows to test
-wind_interval <- 1e4
-max_wind_size <- 3e5
+## set the interval of bp windows to test
+wind_interval <- as.numeric(args[10])
+#wind_interval <- 1e4
+
+max_wind_size <- as.numeric(args[11])
+#max_wind_size <- 3e5
+
 test_bp_window_sizes <- seq(from = wind_interval, to = max_wind_size,
   by = wind_interval)
 
 ### SET OUTPUTS ###
 
+wind_test_text <- args[12]
+# wind_test_text <- 'try2'
+
 wind_test_out <- paste(data_dir, chr_name, '.', vcf_inbetween, '.', 
-  'windowtests.txt', sep = '')
+  wind_test_text, '.windowtests.txt', sep = '')
 
 #######
 #############
